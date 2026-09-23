@@ -559,3 +559,31 @@
   .chat-layout { grid-template-columns: 1fr; }
   .chat-sidebar { display: none; }
 }
+
+@media (max-width: 640px) {
+  .wizard-progress {
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+  .wizard-progress::before {
+    display: none;
+  }
+  .wizard-step-node {
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+  .wizard-step-node span.step-title {
+    font-size: 8.5px;
+    text-align: center;
+  }
+  .wizard-step-node .circle-num {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

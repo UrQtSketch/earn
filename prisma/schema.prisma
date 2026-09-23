@@ -35,6 +35,7 @@ model User {
   savedOpps        SavedOpportunity[]
   auditLogs        AuditLog[]
   notifications    Notification[]
+  experiences      CommunityExperience[]
 }
 
 model UserProfile {
@@ -50,6 +51,7 @@ model UserProfile {
   categories            String?  // JSON stringified array of category slugs
   isPrivate             Boolean  @default(false)
   totalReportedEarnings Float    @default(0)
+  reputationBadge       String?  @default("CONTRIBUTOR") // CONTRIBUTOR, VERIFIED_CONTRIBUTOR, HELPFUL_CONTRIBUTOR, EXPERIENCED_CONTRIBUTOR
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
@@ -88,6 +90,9 @@ model Opportunity {
   authorId         String?
   author           User?                   @relation("AuthorOpps", fields: [authorId], references: [id], onDelete: SetNull)
   status           String                  @default("VERIFIED") // UNDER_REVIEW, VERIFIED, COMMUNITY_REPORTED, NEEDS_REVIEW, REJECTED, SUSPENDED
+  healthStatus     String                  @default("ACTIVE") // ACTIVE, NEEDS_REVIEW, SUSPENDED
+  riskLevel        String                  @default("LOW") // LOW, MODERATE, HIGH, CAPITAL_AT_RISK
+  skillLevel       String                  @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED
   featured         Boolean                 @default(false)
   description      String
   howItWorks       String
@@ -118,6 +123,8 @@ model Opportunity {
   savedBy          SavedOpportunity[]
   reportedEarnings ReportedEarning[]
   collabRequests   CollaborationRequest[]
+  experiences      CommunityExperience[]
+  verificationLogs OpportunityVerificationLog[]
 
   @@index([categoryId, status])
 }
@@ -322,4 +329,36 @@ model Notification {
 
   @@index([userId, isRead, createdAt])
 }
+
+model CommunityExperience {
+  id               String      @id @default(uuid())
+  opportunityId    String
+  opportunity      Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           String      @default("TRIED") // TRIED, IN_PROGRESS, NOT_CONTINUING
+  duration         String?     // e.g., "2 months"
+  hoursSpentWeekly Float?
+  amountEarned     Float?      @default(0)
+  problemsFaced    String?
+  reviewText       String
+  wouldContinue    Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+
+  @@index([opportunityId, createdAt])
+}
+
+model OpportunityVerificationLog {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  stage         String      // SUBMISSION, SOURCE_CHECKED, EVIDENCE_REVIEWED, ADMIN_AUDIT, HEALTH_CHECK
+  status        String      // VERIFIED, NEEDS_REVIEW, SUSPENDED, PENDING
+  note          String?
+  checkedBy     String?     // e.g. "EarnRadar Moderation Team"
+  createdAt     DateTime    @default(now())
+
+  @@index([opportunityId, createdAt])
+}
+
 

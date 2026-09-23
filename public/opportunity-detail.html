@@ -74,6 +74,71 @@
     </div>
   </div>
 
+  <!-- Submit Community Experience Modal -->
+  <div class="modal-overlay" id="experience-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-experience-modal">✕</button>
+      <div class="eyebrow" style="color: var(--yellow);"><i></i> HONEST COMMUNITY FEEDBACK</div>
+      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Share Your Experience</h2>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
+        Help other members know what to realistically expect regarding time, difficulty, and earnings.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Rating (1 to 5 Stars)</label>
+          <select id="exp-rating" class="select">
+            <option value="5">★★★★★ (5/5 Excellent)</option>
+            <option value="4" selected>★★★★☆ (4/5 Good)</option>
+            <option value="3">★★★☆☆ (3/5 Average)</option>
+            <option value="2">★★☆☆☆ (2/5 Below Average)</option>
+            <option value="1">★☆☆☆☆ (1/5 Poor)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Difficulty Level</label>
+          <select id="exp-difficulty" class="select">
+            <option value="1">1/5 — Very Easy</option>
+            <option value="2">2/5 — Easy</option>
+            <option value="3" selected>3/5 — Moderate</option>
+            <option value="4">4/5 — Challenging</option>
+            <option value="5">5/5 — Highly Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Total Earned Amount (₹ or $)</label>
+          <input type="number" id="exp-earned" class="input" placeholder="e.g. 5000">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Weekly Time Spent</label>
+          <input type="text" id="exp-time" class="input" placeholder="e.g. 6-8 hrs/week">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pros / What Worked Well</label>
+        <input type="text" id="exp-pros" class="input" placeholder="e.g. Fast payout approvals, friendly support">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Cons / Practical Drawbacks</label>
+        <input type="text" id="exp-cons" class="input" placeholder="e.g. High initial competition, payout fee">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pro-Tip for Beginners</label>
+        <textarea id="exp-tips" class="textarea" placeholder="Key advice you wish you knew when starting..." style="min-height: 70px;"></textarea>
+      </div>
+
+      <button id="submit-exp-btn" class="btn primary" style="width: 100%;">Submit Review &amp; Earnings Report <b>↗</b></button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
     <span>© 2026 EarnRadar</span>
@@ -235,6 +300,77 @@
               </div>
             ` : ''}
 
+            <!-- Section: Verification History Timeline -->
+            <div class="card" style="margin-bottom: 24px;">
+              <div class="eyebrow" style="color: var(--cyan);"><i></i> AUDIT &amp; VERIFICATION LOGS</div>
+              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Platform Verification History</h3>
+              
+              ${(opp.verificationLogs && opp.verificationLogs.length > 0) ? `
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                  ${opp.verificationLogs.map(log => `
+                    <div style="border-left: 2px solid var(--cyan); padding-left: 14px; position: relative;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="badge ${log.status === 'VERIFIED' ? 'badge-green' : log.status === 'FLAGGED' ? 'badge-red' : 'badge-yellow'}">${escapeHtml(log.status)}</span>
+                        <span style="font-size: 11px; color: var(--muted);">${new Date(log.verifiedAt).toLocaleDateString()}</span>
+                      </div>
+                      <p style="font-size: 13px; color: var(--text-primary); margin: 4px 0 2px;"><b>${escapeHtml(log.verificationMethod || 'Staff Audit')}</b>: ${escapeHtml(log.notes)}</p>
+                      <span style="font-size: 11px; color: var(--dim);">Verified by Moderator ID #${escapeHtml(log.verifiedBy?.slice(0, 8) || 'Staff')}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div style="padding: 16px; background: var(--panel2); border-radius: var(--radius-md); font-size: 12px; color: var(--muted);">
+                  Verified by EarnRadar moderation team on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Payout rails and reproduction steps confirmed.
+                </div>
+              `}
+            </div>
+
+            <!-- Section: Community Experience Reviews -->
+            <div class="card" style="margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <div class="eyebrow" style="color: var(--yellow);"><i></i> REAL MEMBER EXPERIENCES</div>
+                  <h3 style="font: 700 18px var(--font-heading); margin-top: 4px;">Community Ratings &amp; Reviews</h3>
+                </div>
+                <button id="open-experience-btn" class="btn secondary sm">★ Share Your Experience</button>
+              </div>
+
+              ${(opp.experiences && opp.experiences.length > 0) ? `
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                  ${opp.experiences.map(exp => `
+                    <div style="background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 16px;">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <div class="avatar" style="width: 28px; height: 28px; font-size: 11px;">${(exp.user?.profile?.fullName || 'U').charAt(0).toUpperCase()}</div>
+                          <div>
+                            <span style="font-size: 13px; font-weight: 600;">${escapeHtml(exp.user?.profile?.fullName || 'Member')}</span>
+                            ${exp.user?.profile?.reputationBadge ? `<span class="badge badge-cyan" style="font-size: 9px; padding: 2px 6px; margin-left: 4px;">${exp.user.profile.reputationBadge}</span>` : ''}
+                          </div>
+                        </div>
+                        <div style="color: var(--yellow); font-size: 14px;">
+                          ${'★'.repeat(exp.rating)}${'☆'.repeat(5 - exp.rating)}
+                        </div>
+                      </div>
+
+                      <div style="display: flex; gap: 16px; font-size: 11px; color: var(--muted); margin-bottom: 10px; flex-wrap: wrap;">
+                        ${exp.earnedAmount ? `<span>💰 Earned: <b style="color: var(--green);">${formatCurrency(exp.earnedAmount)}</b></span>` : ''}
+                        ${exp.timeSpentWeekly ? `<span>⏱ Weekly Effort: <b>${escapeHtml(exp.timeSpentWeekly)}</b></span>` : ''}
+                        <span>Difficulty: <b>${exp.difficulty}/5</b></span>
+                      </div>
+
+                      ${exp.pros ? `<div style="font-size: 12px; margin-bottom: 4px;"><span style="color: var(--green); font-weight: 600;">Pros:</span> <span style="color: var(--text);">${escapeHtml(exp.pros)}</span></div>` : ''}
+                      ${exp.cons ? `<div style="font-size: 12px; margin-bottom: 4px;"><span style="color: var(--red); font-weight: 600;">Cons:</span> <span style="color: var(--text);">${escapeHtml(exp.cons)}</span></div>` : ''}
+                      ${exp.tips ? `<div style="font-size: 12px;"><span style="color: var(--cyan); font-weight: 600;">Tip:</span> <span style="color: var(--muted);">${escapeHtml(exp.tips)}</span></div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : `
+                <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 13px;">
+                  No community experience reports yet. Have you tried this method? Click <b>Share Your Experience</b> above!
+                </div>
+              `}
+            </div>
+
             <!-- Section: Community Discussion & Comments -->
             <div class="discussion-section">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -293,6 +429,10 @@
                 <button id="open-collab-btn" class="btn cyan" style="width: 100%;">
                   🤝 Request Collaboration
                 </button>
+
+                <a href="/compare?ids=${opp.id}" class="btn secondary sm" style="width: 100%; text-align: center; justify-content: center;">
+                  ⚖ Compare with Others
+                </a>
               </div>
 
               ${opp.officialSource ? `
@@ -497,6 +637,58 @@
             showToast(err.message, 'error');
           } finally {
             submitReportBtn.disabled = false;
+          }
+        });
+      }
+
+      // Experience Modal
+      const openExpBtn = document.getElementById('open-experience-btn');
+      const expModal = document.getElementById('experience-modal');
+      const closeExpModal = document.getElementById('close-experience-modal');
+      const submitExpBtn = document.getElementById('submit-exp-btn');
+
+      if (openExpBtn && expModal) {
+        openExpBtn.addEventListener('click', () => {
+          if (!currentUser) {
+            showToast('Please log in to share your experience report.', 'info');
+            return;
+          }
+          expModal.classList.add('show');
+        });
+        closeExpModal.addEventListener('click', () => expModal.classList.remove('show'));
+
+        submitExpBtn.addEventListener('click', async () => {
+          const rating = document.getElementById('exp-rating').value;
+          const difficulty = document.getElementById('exp-difficulty').value;
+          const earnedAmount = document.getElementById('exp-earned').value;
+          const timeSpentWeekly = document.getElementById('exp-time').value.trim();
+          const pros = document.getElementById('exp-pros').value.trim();
+          const cons = document.getElementById('exp-cons').value.trim();
+          const tips = document.getElementById('exp-tips').value.trim();
+
+          submitExpBtn.disabled = true;
+          try {
+            const res = await API.submitExperience(currentOpp.id, {
+              rating,
+              difficulty,
+              earnedAmount,
+              timeSpentWeekly,
+              pros,
+              cons,
+              tips
+            });
+
+            if (res.success) {
+              showToast(res.message, 'success');
+              expModal.classList.remove('show');
+              loadOpportunityDossier();
+            } else {
+              showToast(res.error || 'Failed to submit experience.', 'error');
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          } finally {
+            submitExpBtn.disabled = false;
           }
         });
       }

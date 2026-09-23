@@ -334,7 +334,47 @@ async function main() {
     }
   });
 
-  console.log('✔ Comments and Reported Earnings seeded');
+  // 6. Verification History Logs
+  await prisma.opportunityVerificationLog.createMany({
+    data: [
+      { opportunityId: opp1.id, stage: 'SUBMISSION', status: 'PENDING', note: 'Initial tournament details submitted.', checkedBy: 'System' },
+      { opportunityId: opp1.id, stage: 'SOURCE_CHECKED', status: 'VERIFIED', note: 'Official federation rules and discord referee confirmed.', checkedBy: 'EarnRadar Verification Team' },
+      { opportunityId: opp1.id, stage: 'ADMIN_AUDIT', status: 'VERIFIED', note: 'Tournament bracket payout proof inspected.', checkedBy: 'Admin Mod' },
+      { opportunityId: opp2.id, stage: 'SUBMISSION', status: 'PENDING', note: 'Freelance video editing workflow submitted.', checkedBy: 'System' },
+      { opportunityId: opp2.id, stage: 'EVIDENCE_REVIEWED', status: 'VERIFIED', note: 'Client retainer invoice and deliverable timeline verified.', checkedBy: 'EarnRadar Verification Team' },
+      { opportunityId: opp2.id, stage: 'ADMIN_AUDIT', status: 'VERIFIED', note: 'Published to live radar.', checkedBy: 'Admin Mod' }
+    ]
+  });
+
+  // 7. Community Experience
+  await prisma.communityExperience.createMany({
+    data: [
+      {
+        opportunityId: opp2.id,
+        userId: user2.id,
+        status: 'TRIED',
+        duration: '1.5 months',
+        hoursSpentWeekly: 12,
+        amountEarned: 18000,
+        problemsFaced: 'Initial client acquisition required sending 8-10 customized sample pitches.',
+        reviewText: 'Followed the 3-sample video strategy. Landed a YouTube gaming creator client at ₹1,500/short.',
+        wouldContinue: true
+      },
+      {
+        opportunityId: opp1.id,
+        userId: user1.id,
+        status: 'TRIED',
+        duration: '3 weeks',
+        hoursSpentWeekly: 6,
+        amountEarned: 4500,
+        problemsFaced: 'High competition in quarter-final brackets.',
+        reviewText: 'Prize was distributed within 48 hours to registered game account.',
+        wouldContinue: true
+      }
+    ]
+  });
+
+  console.log('✔ Comments, Verification Logs and Community Experiences seeded');
   console.log('\n========================================================');
   console.log('🎉 Database seeding complete!');
   console.log('Admin Account: admin@earnradar.io | Password: AdminPassword2026!');

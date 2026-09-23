@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .legal-content h2 {
+      font: 700 20px var(--font-heading);
+      color: var(--text-primary);
+      margin: 32px 0 12px;
+    }
+    .legal-content p, .legal-content li {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px; max-width: 800px;">
+    <div style="margin-bottom: 32px;">
+      <div class="eyebrow"><i></i> LEGAL &amp; DATA PROTECTION</div>
+      <h1 style="font: 700 clamp(30px, 4vw, 44px) var(--font-heading); margin-top: 6px;">
+        Privacy Policy
+      </h1>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 6px;">
+        Last updated: September 2026 · Effective immediately
+      </p>
+    </div>
+
+    <div class="card legal-content" style="padding: 36px;">
+      <h2>1. Overview and Commitment</h2>
+      <p>
+        EarnRadar ("we", "our", or "us") operates as a community-driven verification platform for online earning methods. We take data privacy seriously and adhere strictly to principles of data minimization, transparency, and user privacy protection.
+      </p>
+
+      <h2>2. Information We Collect</h2>
+      <p>We collect only the minimum required information necessary to provide our discovery, verification, and collaboration services:</p>
+      <ul>
+        <li><b>Account Credentials:</b> Email address, encrypted passwords, and profile usernames.</li>
+        <li><b>Profile Preferences:</b> Optional bios, skills, countries of origin, and notification settings.</li>
+        <li><b>Community Contributions:</b> Method submissions, step-by-step instructions, comments, earnings proof screenshots, and video demonstration links.</li>
+        <li><b>Direct Communications:</b> Messages exchanged through our internal messaging system.</li>
+      </ul>
+
+      <h2>3. Evidence &amp; Financial Data Protection</h2>
+      <p>
+        When uploading proof screenshots (such as payout receipts or dashboard confirmations), users are explicitly instructed to redact personally identifiable financial information (bank account numbers, physical addresses, national ID numbers). We do not store unredacted bank account credentials.
+      </p>
+
+      <h2>4. Use of Data</h2>
+      <p>Your information is used strictly to:</p>
+      <ul>
+        <li>Authenticate your session securely via email OTP.</li>
+        <li>Moderate and verify submitted earning opportunities.</li>
+        <li>Facilitate secure peer-to-peer collaboration requests.</li>
+        <li>Prevent fraud, abusive behavior, spam, and financial scams.</li>
+      </ul>
+
+      <h2>5. Zero Data Brokering</h2>
+      <p>
+        <b>We do NOT sell, rent, or trade your personal data, contact information, or financial activity to third-party advertisers or data brokers under any circumstances.</b>
+      </p>
+
+      <h2>6. Security Measures</h2>
+      <p>
+        All passwords are cryptographically hashed using Argon2/Bcrypt algorithms. All network traffic is encrypted via TLS/HTTPS, and authentication tokens are secured with HttpOnly, SameSite cookies.
+      </p>
+
+      <h2>7. Your Rights &amp; Data Deletion</h2>
+      <p>
+        You have the right to inspect, export, or permanently delete your account and associated submission data at any time from your account settings or by contacting <a href="mailto:support@earnradar.io" style="color: var(--cyan);">support@earnradar.io</a>.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <div style="display: flex; gap: 20px; font-size: 13px;">
+      <a href="/privacy" style="color: var(--cyan);">Privacy Policy</a>
+      <a href="/terms" style="color: var(--muted);">Terms of Service</a>
+      <a href="/guidelines" style="color: var(--muted);">Guidelines</a>
+      <a href="/disclaimer" style="color: var(--muted);">Disclaimer</a>
+    </div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { initNavbar } from '/js/api.js';
+    import { initNavbar as renderNav } from '/js/ui.js';
+    await renderNav('/privacy');
+  </script>
+</body>
+</html>

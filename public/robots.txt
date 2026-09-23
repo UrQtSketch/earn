@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /messages
+Disallow: /settings
+
+Sitemap: https://earnradar.onrender.com/sitemap.xml

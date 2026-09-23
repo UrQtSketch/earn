@@ -111,6 +111,21 @@ export const API = {
     return res.json();
   },
 
+  async compareOpportunities(ids) {
+    const idList = Array.isArray(ids) ? ids.join(',') : ids;
+    const res = await fetch(`/api/opportunities/compare?ids=${encodeURIComponent(idList)}`);
+    return res.json();
+  },
+
+  async submitExperience(opportunityId, data) {
+    const res = await fetch(`/api/opportunities/${opportunityId}/experience`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  },
+
   // 9-Step Submissions
   async getMySubmissions() {
     const res = await fetch('/api/submissions/my');

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community &amp; Method Guidelines — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .legal-content h2 {
+      font: 700 20px var(--font-heading);
+      color: var(--text-primary);
+      margin: 32px 0 12px;
+    }
+    .legal-content p, .legal-content li {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+    .guideline-box {
+      background: rgba(0, 229, 255, 0.03);
+      border: 1px solid rgba(0, 229, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px; max-width: 800px;">
+    <div style="margin-bottom: 32px;">
+      <div class="eyebrow"><i></i> STANDARDS &amp; VERIFICATION CRITERIA</div>
+      <h1 style="font: 700 clamp(30px, 4vw, 44px) var(--font-heading); margin-top: 6px;">
+        Community Guidelines
+      </h1>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 6px;">
+        How we maintain high signal, honest data, and zero noise across the EarnRadar directory.
+      </p>
+    </div>
+
+    <div class="card legal-content" style="padding: 36px;">
+      <h2>1. The Verification-First Standard</h2>
+      <p>
+        EarnRadar exists to separate real, reproducible earning methods from exaggerated marketing claims. Every method submitted to the radar is evaluated by human moderators against strict reproducibility standards.
+      </p>
+
+      <h2>2. What Makes a High-Quality Method Submission</h2>
+      <div class="guideline-box">
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><b>Actionable Step-by-Step Instructions:</b> Clear prerequisites, account creation workflows, tools needed, and day-to-day execution.</li>
+          <li><b>Realistic Time &amp; Skill Estimates:</b> Honest representation of learning curve (e.g. 5 hours of setup vs. immediate start).</li>
+          <li><b>Zero Hidden Costs:</b> Explicit disclosure of software subscriptions, gas fees, or capital required.</li>
+          <li><b>Transparent Risk Assessment:</b> Highlighting saturation risks, account banning risks, and chargeback possibilities.</li>
+        </ul>
+      </div>
+
+      <h2>3. Evidence Standards</h2>
+      <p>When providing proof of earnings or operational status:</p>
+      <ul>
+        <li>Screenshots must clearly show platform interfaces, transaction dates, and valid payout statuses (e.g. Stripe, PayPal, Upwork, Steam, AdSense).</li>
+        <li><b>Redaction Mandatory:</b> Never include real bank routing numbers, credit card digits, national identification numbers, or residential addresses.</li>
+        <li>Doctored images (inspected via metadata and image forensics) result in immediate, permanent account bans.</li>
+      </ul>
+
+      <h2>4. Prohibited Content</h2>
+      <ul>
+        <li>No affiliate links that bypass transparent disclosures.</li>
+        <li>No gambling, sports betting, or unregistered binary options schemes.</li>
+        <li>No paid review manipulation or coordinated upvoting rings.</li>
+        <li>No multi-level marketing (MLM) or "pay to join and recruit friends" models.</li>
+      </ul>
+
+      <h2>5. Respectful Collaboration &amp; Chat</h2>
+      <p>
+        Treat fellow members with respect. Any harassment, unsolicited spam, extortion, or fraudulent propositions will be met with immediate expulsion and IP blacklisting.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <div style="display: flex; gap: 20px; font-size: 13px;">
+      <a href="/privacy" style="color: var(--muted);">Privacy Policy</a>
+      <a href="/terms" style="color: var(--muted);">Terms of Service</a>
+      <a href="/guidelines" style="color: var(--cyan);">Guidelines</a>
+      <a href="/disclaimer" style="color: var(--muted);">Disclaimer</a>
+    </div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { initNavbar } from '/js/ui.js';
+    await initNavbar('/guidelines');
+  </script>
+</body>
+</html>

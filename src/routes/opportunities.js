@@ -36,11 +36,74 @@ router.get('/categories', async (req, res) => {
 });
 
 /**
+ * Compare multiple opportunities side-by-side
+ */
+router.get('/compare', async (req, res) => {
+  try {
+    const { ids } = req.query;
+    if (!ids) {
+      return res.status(400).json({ success: false, error: 'Provide opportunity IDs to compare.' });
+    }
+
+    const idList = String(ids).split(',').map(s => s.trim()).filter(Boolean);
+    if (idList.length === 0) {
+      return res.status(400).json({ success: false, error: 'At least one valid opportunity ID is required.' });
+    }
+
+    const opportunities = await prisma.opportunity.findMany({
+      where: {
+        id: { in: idList },
+        status: 'VERIFIED'
+      },
+      include: {
+        category: true,
+        steps: { orderBy: { stepNumber: 'asc' } },
+        evidence: true,
+        verificationLogs: { orderBy: { createdAt: 'desc' }, take: 1 },
+        experiences: true
+      }
+    });
+
+    const formatted = opportunities.map(opp => {
+      const totalExperiences = opp.experiences.length;
+
+      return {
+        id: opp.id,
+        title: opp.title,
+        slug: opp.slug,
+        category: opp.category.name,
+        categoryIcon: opp.category.icon,
+        description: opp.description,
+        skillLevel: opp.skillLevel,
+        riskLevel: opp.riskLevel,
+        healthStatus: opp.healthStatus,
+        timeRequired: opp.timeRequired,
+        startingCost: opp.startingCost,
+        potentialEarning: opp.potentialEarning,
+        earningModel: opp.earningModel,
+        location: opp.location,
+        lastVerifiedDate: opp.lastVerifiedDate,
+        stepsCount: opp.steps.length,
+        evidenceCount: opp.evidence.length,
+        communityExperienceCount: totalExperiences,
+        safetyChecklist: (() => {
+          try { return JSON.parse(opp.safetyChecklist || '[]'); } catch (_) { return []; }
+        })()
+      };
+    });
+
+    return res.json({ success: true, opportunities: formatted });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * List & Filter Opportunities (The Feed)
  */
 router.get('/', async (req, res) => {
   try {
-    const { category, search, sort = 'latest', featured, status } = req.query;
+    const { category, search, sort = 'latest', featured, status, skillLevel, riskLevel, healthStatus } = req.query;
 
     const where = {
       status: status || 'VERIFIED'
@@ -48,6 +111,18 @@ router.get('/', async (req, res) => {
 
     if (category && category !== 'all') {
       where.category = { slug: String(category).toLowerCase() };
+    }
+
+    if (skillLevel && skillLevel !== 'all') {
+      where.skillLevel = skillLevel;
+    }
+
+    if (riskLevel && riskLevel !== 'all') {
+      where.riskLevel = riskLevel;
+    }
+
+    if (healthStatus && healthStatus !== 'all') {
+      where.healthStatus = healthStatus;
     }
 
     if (featured === 'true') {
@@ -79,12 +154,12 @@ router.get('/', async (req, res) => {
           select: {
             id: true,
             profile: {
-              select: { fullName: true, username: true, avatarUrl: true }
+              select: { fullName: true, username: true, avatarUrl: true, reputationBadge: true }
             }
           }
         },
         _count: {
-          select: { memberships: true, comments: true, evidence: true }
+          select: { memberships: true, comments: true, evidence: true, experiences: true }
         }
       }
     });
@@ -98,6 +173,9 @@ router.get('/', async (req, res) => {
       categoryIcon: opp.category.icon,
       status: opp.status,
       featured: opp.featured,
+      healthStatus: opp.healthStatus,
+      riskLevel: opp.riskLevel,
+      skillLevel: opp.skillLevel,
       description: opp.description,
       skillsRequired: opp.skillsRequired,
       timeRequired: opp.timeRequired,
@@ -111,10 +189,12 @@ router.get('/', async (req, res) => {
       author: opp.author ? {
         id: opp.author.id,
         name: opp.author.profile?.fullName,
-        username: opp.author.profile?.username
+        username: opp.author.profile?.username,
+        badge: opp.author.profile?.reputationBadge
       } : null,
       commentsCount: opp._count.comments,
       evidenceCount: opp._count.evidence,
+      experiencesCount: opp._count.experiences,
       createdAt: opp.createdAt
     }));
 
@@ -186,7 +266,23 @@ router.get('/:idOrSlug', async (req, res) => {
           take: 5,
           orderBy: { createdAt: 'desc' },
           include: {
-            user: { select: { profile: { select: { username: true, fullName: true } } } }
+            user: { select: { profile: { select: { username: true, fullName: true, avatarUrl: true, reputationBadge: true } } } }
+          }
+        },
+        verificationLogs: {
+          orderBy: { createdAt: 'desc' }
+        },
+        experiences: {
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: {
+              select: {
+                id: true,
+                profile: {
+                  select: { fullName: true, username: true, avatarUrl: true, reputationBadge: true }
+                }
+              }
+            }
           }
         }
       }
@@ -243,6 +339,68 @@ router.get('/:idOrSlug', async (req, res) => {
         userMembership,
         isSaved
       }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * Submit Community Experience / Review for an Opportunity
+ */
+router.post('/:id/experience', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      rating,
+      difficulty,
+      timeSpentWeekly,
+      earnedAmount,
+      amountEarned,
+      pros,
+      cons,
+      tips,
+      reviewText,
+      problemsFaced,
+      duration,
+      wouldContinue
+    } = req.body;
+
+    const opportunity = await prisma.opportunity.findUnique({ where: { id } });
+    if (!opportunity) {
+      return res.status(404).json({ success: false, error: 'Opportunity not found.' });
+    }
+
+    const reviewContent = reviewText || [pros ? `Pros: ${pros}` : '', tips ? `Tips: ${tips}` : ''].filter(Boolean).join('\n') || 'Community member experience report.';
+    const finalAmount = earnedAmount !== undefined ? parseFloat(earnedAmount) : (amountEarned !== undefined ? parseFloat(amountEarned) : 0);
+
+    // Create user's experience for this opportunity
+    const experience = await prisma.communityExperience.create({
+      data: {
+        opportunityId: id,
+        userId: req.user.id,
+        duration: duration || timeSpentWeekly || 'Active',
+        hoursSpentWeekly: difficulty ? parseFloat(difficulty) : null,
+        amountEarned: isNaN(finalAmount) ? 0 : finalAmount,
+        problemsFaced: problemsFaced || cons || null,
+        reviewText: reviewContent,
+        wouldContinue: wouldContinue !== undefined ? Boolean(wouldContinue) : (rating ? parseInt(rating, 10) >= 3 : true),
+        status: 'TRIED'
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            profile: { select: { fullName: true, username: true, avatarUrl: true, reputationBadge: true } }
+          }
+        }
+      }
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Thank you! Your experience report has been added to help other members.',
+      experience
     });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });

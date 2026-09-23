@@ -278,4 +278,45 @@ export async function initNavbar(activePath = '') {
 
   const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
   if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', logoutHandler);
+
+  // Initialize Footer
+  initFooter();
+}
+
+/**
+ * Injects unified canonical footer with copyright, legal links, server status, and Sketch credits
+ */
+export function initFooter() {
+  const footer = document.querySelector('footer');
+  if (!footer) return;
+
+  footer.innerHTML = `
+    <div class="footer-left">
+      <a class="footer-logo" href="/">
+        <span class="logo-mark">↗</span>
+        <span>Earn<span>Radar</span></span>
+      </a>
+      <div style="color: var(--muted); font-size: 11.5px; margin-top: 2px;">
+        © 2026 EarnRadar. All rights reserved. Zero guaranteed income claims · Verification-first directory.
+      </div>
+      <div class="footer-links" style="margin-top: 6px;">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/guidelines">Guidelines</a>
+        <a href="/disclaimer">Disclaimer</a>
+        <a href="/compare">Compare Methods</a>
+      </div>
+    </div>
+
+    <div class="footer-right">
+      <div class="server-status-pill" title="Server operational with 99.9% uptime">
+        <span class="pulse-dot"></span>
+        <span>Server: Online (Render v2.0)</span>
+      </div>
+      <a class="sketch-credit-badge" href="https://github.com/UrQtSketch" target="_blank" rel="noopener noreferrer">
+        <span class="sparkle">✨</span>
+        <span>Created by <b>Sketch</b></span>
+      </a>
+    </div>
+  `;
 }

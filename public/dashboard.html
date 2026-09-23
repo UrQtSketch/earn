@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <!-- Welcome Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 24px;">
+      <div>
+        <div class="eyebrow"><i></i> PERSONAL EARNING RADAR</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 42px) var(--font-heading);">
+          Welcome back, <span id="user-display-name" style="color: var(--cyan);">User</span>
+        </h1>
+        <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+          Track your joined opportunities, verify new methods, and coordinate with collaborators.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a class="btn primary" href="/share-method">+ Share a Method <b>↗</b></a>
+        <a class="btn secondary" href="/opportunities">Browse Radar</a>
+      </div>
+    </div>
+
+    <!-- Activity Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-box">
+        <small>OPPORTUNITIES JOINED</small>
+        <strong id="stat-joined-count">0</strong>
+        <span><a href="/my-opportunities" style="color: var(--cyan);">View active checklist →</a></span>
+      </div>
+
+      <div class="stat-box">
+        <small>METHODS SHARED</small>
+        <strong id="stat-submissions-count">0</strong>
+        <span><a href="/my-submissions" style="color: var(--cyan);">Check submission statuses →</a></span>
+      </div>
+
+      <div class="stat-box">
+        <small>COLLABORATIONS</small>
+        <strong id="stat-collabs-count">0</strong>
+        <span><a href="/collaborations" style="color: var(--cyan);">Manage connections →</a></span>
+      </div>
+
+      <div class="stat-box">
+        <small>REPORTED EARNINGS</small>
+        <strong id="stat-earnings-total" style="color: var(--green);">₹0</strong>
+        <span style="font-size: 10px; color: var(--dim);">USER-REPORTED FIGURE</span>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; margin-top: 40px;">
+      <!-- Left Column: Recommended & Trending -->
+      <div>
+        <!-- Recommended For You -->
+        <div style="margin-bottom: 40px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <small class="eyebrow" style="margin-bottom: 4px;">MATCHED TO YOUR SKILLS</small>
+              <h2 style="font: 700 22px var(--font-heading);">Recommended for you</h2>
+            </div>
+            <a href="/opportunities" style="font-size: 12px; color: var(--cyan); font-weight: 700;">Explore all →</a>
+          </div>
+
+          <div class="opportunity-list" id="recommended-list">
+            <div style="padding: 24px; text-align: center; color: var(--muted);">Loading recommendations...</div>
+          </div>
+        </div>
+
+        <!-- Trending Opportunities -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <small class="eyebrow" style="margin-bottom: 4px;">HIGH PARTICIPATION</small>
+              <h2 style="font: 700 22px var(--font-heading);">Trending on the Radar</h2>
+            </div>
+          </div>
+
+          <div class="opportunity-list" id="trending-list">
+            <div style="padding: 24px; text-align: center; color: var(--muted);">Loading trending opportunities...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Success Stories & Trust Feed -->
+      <div>
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="eyebrow"><i></i> COMMUNITY EXPERIENCE</div>
+          <h3 style="font: 700 18px var(--font-heading); margin-bottom: 12px;">Recent Verified Claims</h3>
+          <p style="color: var(--muted); font-size: 11px; margin-bottom: 20px;">
+            Evidence reviewed submissions with documented proof of time spent and earnings.
+          </p>
+
+          <div id="claims-feed-container" style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.01);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; font-size: 12px;">@priyacreates</span>
+                <span class="tags"><span class="verified">VERIFIED SOURCE</span></span>
+              </div>
+              <strong style="font: 700 16px var(--font-heading); color: var(--green);">₹45,000 reported</strong>
+              <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Short-form Video Editing Retainers • 35 hrs spent</p>
+            </div>
+
+            <div style="padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.01);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 700; font-size: 12px;">@rahulesports</span>
+                <span class="tags"><span class="checked">EVIDENCE REVIEWED</span></span>
+              </div>
+              <strong style="font: 700 16px var(--font-heading); color: var(--green);">₹12,000 reported</strong>
+              <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Gaming Tournament Brackets • 16 hrs spent</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="shield" style="width: 36px; height: 36px; font-size: 14px; margin-bottom: 14px;">✓</div>
+          <h3 style="font: 700 16px var(--font-heading); margin-bottom: 8px;">EarnRadar Honesty Rule</h3>
+          <p style="font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 14px;">
+            Earnings are variable and never guaranteed. Never pay upfront fees to unverified parties, and never share OTPs or private bank logins.
+          </p>
+          <a class="btn cyan sm" href="/share-method" style="width: 100%;">Share a Verified Method</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatTimeAgo, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/dashboard');
+
+    // Load User Profile and Activity
+    async function loadDashboard() {
+      try {
+        const session = await API.getSession();
+        if (!session.authenticated) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const user = session.user;
+        document.getElementById('user-display-name').textContent = user.profile?.fullName || 'Earner';
+
+        // Load profile details with counts
+        const profRes = await API.getProfile();
+        if (profRes.success && profRes.user) {
+          const u = profRes.user;
+          document.getElementById('stat-joined-count').textContent = u.memberships?.length || 0;
+          document.getElementById('stat-submissions-count').textContent = u.submissions?.length || 0;
+          document.getElementById('stat-earnings-total').textContent = formatCurrency(u.profile?.totalReportedEarnings || 0);
+        }
+
+        // Load collaborations count
+        const collabRes = await API.getCollaborations();
+        if (collabRes.success) {
+          const totalCollabs = (collabRes.connections?.length || 0) + (collabRes.incoming?.filter(r => r.status === 'PENDING').length || 0);
+          document.getElementById('stat-collabs-count').textContent = totalCollabs;
+        }
+
+        // Load Recommended & Trending Opportunities
+        const oppRes = await API.getOpportunities();
+        if (oppRes.success && oppRes.opportunities) {
+          const recContainer = document.getElementById('recommended-list');
+          const trendContainer = document.getElementById('trending-list');
+
+          const userCats = user.profile?.categories || [];
+
+          const recommended = oppRes.opportunities.filter(o => userCats.includes(o.categorySlug)).slice(0, 3);
+          const trending = [...oppRes.opportunities].sort((a, b) => b.joinsCount - a.joinsCount).slice(0, 3);
+
+          renderOppList(recContainer, recommended.length > 0 ? recommended : oppRes.opportunities.slice(0, 3));
+          renderOppList(trendContainer, trending);
+        }
+      } catch (err) {
+        console.error('Dashboard load error', err);
+      }
+    }
+
+    function renderOppList(container, list) {
+      if (list.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; color: var(--muted); font-size: 12px;">No opportunities found.</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(opp => {
+        const iconClass = opp.categorySlug === 'gaming' ? 'purple' : opp.categorySlug === 'freelancing' ? 'cyan' : opp.categorySlug === 'creator' ? 'pink' : 'green';
+        return `
+          <article class="opportunity" onclick="window.location.href='/opportunities/${opp.slug}'" style="cursor: pointer;">
+            <div class="opp-icon ${iconClass}">${opp.categoryIcon || '⚡'}</div>
+            <div class="opp-body">
+              <div class="tags">
+                <span class="verified">${opp.status}</span>
+                <span>${escapeHtml(opp.category)}</span>
+                <em>${formatTimeAgo(opp.createdAt)}</em>
+              </div>
+              <h3>${escapeHtml(opp.title)}</h3>
+              <p>${escapeHtml(opp.description)}</p>
+              <div class="meta">
+                <span>⏱ ${escapeHtml(opp.timeRequired || 'Flexible')}</span>
+                <span>👥 ${opp.joinsCount} participating</span>
+              </div>
+            </div>
+            <div class="opp-value">
+              <small>REPORTED RESULT</small>
+              <strong>${escapeHtml(opp.potentialEarning || 'Variable')}</strong>
+              <label>${escapeHtml(opp.earningModel || 'MODEL')}</label>
+              <a href="/opportunities/${opp.slug}">View dossier →</a>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log — EarnRadar Admin</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow"><i></i> IMMUTABLE AUDIT TRAIL</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">System Audit Log</h1>
+        <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+          Chronological log of all administrative and moderation actions taken on the platform.
+        </p>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link active">📜 Audit Log</a>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Admin</th>
+            <th>Action</th>
+            <th>Target</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="audit-tbody">
+          <tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--muted);">Loading audit logs...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/admin/audit-log');
+
+    async function loadAuditLogs() {
+      const tbody = document.getElementById('audit-tbody');
+      try {
+        const res = await API.getAdminAuditLogs();
+        if (res.success && res.logs?.length > 0) {
+          tbody.innerHTML = res.logs.map(log => `
+            <tr>
+              <td style="font-size: 11px; color: var(--muted); white-space: nowrap;">
+                ${new Date(log.createdAt).toLocaleString()} (${formatTimeAgo(log.createdAt)})
+              </td>
+              <td>
+                <b>${escapeHtml(log.admin?.profile?.fullName || 'Admin')}</b>
+                <div style="font-size: 10px; color: var(--cyan);">@${escapeHtml(log.admin?.profile?.username || 'admin')}</div>
+              </td>
+              <td><span class="status-pill submitted">${escapeHtml(log.action)}</span></td>
+              <td><b style="font-size: 11px;">${log.targetType}</b> #${log.targetId.slice(0, 8)}</td>
+              <td><pre style="font-size: 10px; color: var(--muted); font-family: monospace; white-space: pre-wrap; margin: 0;">${escapeHtml(log.details || '')}</pre></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--muted);">No audit log entries recorded yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadAuditLogs();
+  </script>
+</body>
+</html>

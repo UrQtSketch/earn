@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container">
+    <div class="chat-layout">
+      <!-- Left Sidebar: Conversations List -->
+      <aside class="chat-sidebar">
+        <div class="chat-sidebar-header">
+          <span>Direct Messages</span>
+        </div>
+        <div class="conversation-list" id="conversations-list-container">
+          <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 12px;">Loading conversations...</div>
+        </div>
+      </aside>
+
+      <!-- Right Pane: Active Chat -->
+      <section class="chat-main" id="chat-pane-root">
+        <div style="flex: 1; display: grid; place-items: center; color: var(--muted); font-size: 13px;">
+          Select a conversation from the sidebar to view messages.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/messages');
+
+    let currentConvId = null;
+    let currentPartner = null;
+    let currentUser = null;
+
+    async function initChat() {
+      const session = await API.getSession();
+      if (!session.authenticated) {
+        window.location.href = '/login';
+        return;
+      }
+      currentUser = session.user;
+
+      await loadConversations();
+    }
+
+    async function loadConversations() {
+      const listContainer = document.getElementById('conversations-list-container');
+      try {
+        const res = await API.getConversations();
+        if (res.success && res.conversations?.length > 0) {
+          listContainer.innerHTML = res.conversations.map(c => `
+            <div class="conversation-item ${c.id === currentConvId ? 'active' : ''}" data-id="${c.id}" data-partner='${JSON.stringify(c.partner)}'>
+              <div class="avatar" style="width: 36px; height: 36px; font-size: 12px;">${(c.partner.name || 'U').charAt(0).toUpperCase()}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(c.partner.name || 'User')}</strong>
+                  <span style="font-size: 9px; color: var(--dim);">${formatTimeAgo(c.updatedAt)}</span>
+                </div>
+                <p style="font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                  ${escapeHtml(c.lastMessage?.content || 'Started conversation')}
+                </p>
+              </div>
+            </div>
+          `).join('');
+
+          document.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', () => {
+              const id = item.getAttribute('data-id');
+              const partner = JSON.parse(item.getAttribute('data-partner'));
+              openConversation(id, partner);
+            });
+          });
+
+          // Open first conversation automatically if none open
+          if (!currentConvId && res.conversations[0]) {
+            openConversation(res.conversations[0].id, res.conversations[0].partner);
+          }
+        } else {
+          listContainer.innerHTML = '<div style="padding: 24px 16px; color: var(--muted); font-size: 12px; text-align: center;">No active conversations yet. Connect with members via opportunities!</div>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function openConversation(convId, partner) {
+      currentConvId = convId;
+      currentPartner = partner;
+
+      const pane = document.getElementById('chat-pane-root');
+      pane.innerHTML = `
+        <div class="chat-header">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="avatar" style="width: 32px; height: 32px; font-size: 12px;">${(partner.name || 'U').charAt(0).toUpperCase()}</div>
+            <div>
+              <b style="font-size: 14px;">${escapeHtml(partner.name || 'User')}</b>
+              <div style="font-size: 10px; color: var(--cyan);">@${escapeHtml(partner.username || 'user')}</div>
+            </div>
+          </div>
+          <button id="report-user-btn" class="btn secondary sm" style="color: var(--red);">⚠ Report User</button>
+        </div>
+
+        <div style="padding: 10px 24px; background: rgba(255,216,107,0.04); border-bottom: 1px solid var(--line); font-size: 10px; color: var(--yellow);">
+          <b>🛡 Safety Warning:</b> Never exchange private passwords, OTPs, or transfer money outside verified escrow platforms.
+        </div>
+
+        <div class="chat-messages" id="messages-stream">
+          <div style="text-align: center; color: var(--muted); font-size: 12px;">Loading messages...</div>
+        </div>
+
+        <div class="chat-footer">
+          <form id="send-message-form" style="display: flex; gap: 10px;">
+            <input type="text" id="message-text-input" class="input" placeholder="Type a safe message..." autocomplete="off" required>
+            <button type="submit" class="btn primary" style="min-width: 100px;">Send <b>↗</b></button>
+          </form>
+        </div>
+      `;
+
+      await loadMessages();
+
+      // Send form listener
+      document.getElementById('send-message-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('message-text-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        try {
+          const res = await API.sendMessage(currentConvId, currentPartner.id, text);
+          if (res.success) {
+            await loadMessages();
+          } else {
+            showToast(res.error || 'Failed to send.', 'error');
+          }
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      });
+    }
+
+    async function loadMessages() {
+      if (!currentConvId) return;
+      const stream = document.getElementById('messages-stream');
+
+      try {
+        const res = await API.getMessages(currentConvId);
+        if (res.success && res.messages) {
+          stream.innerHTML = res.messages.map(m => {
+            const isMine = m.senderId === currentUser.id;
+            return `
+              <div class="chat-bubble ${isMine ? 'mine' : 'theirs'}">
+                <div>${escapeHtml(m.content)}</div>
+                <div style="font-size: 8px; opacity: 0.7; margin-top: 4px; text-align: ${isMine ? 'right' : 'left'};">
+                  ${formatTimeAgo(m.createdAt)}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          stream.scrollTop = stream.scrollHeight;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    initChat();
+  </script>
+</body>
+</html>

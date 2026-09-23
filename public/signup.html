@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .auth-wrapper {
+      min-height: calc(100vh - 170px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .auth-box {
+      width: min(480px, 100%);
+      padding: 36px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(16,23,34,0.92), rgba(6,9,14,0.92));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-header h1 {
+      font: 700 26px var(--font-heading);
+      margin-top: 8px;
+    }
+    .auth-header p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container auth-wrapper">
+    <div class="auth-box">
+      <div class="auth-header">
+        <div class="eyebrow" style="justify-content: center;"><i></i> JOIN EARNRADAR</div>
+        <h1>Create your account</h1>
+        <p>Discover real ways to earn, verified by community evidence.</p>
+      </div>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="full-name" class="input" placeholder="e.g. Alex Sharma" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="email" class="input" placeholder="name@domain.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password <small>(min. 8 characters)</small></label>
+          <input type="password" id="password" class="input" placeholder="••••••••••••" required autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" id="confirm-password" class="input" placeholder="••••••••••••" required autocomplete="new-password">
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label style="display: flex; gap: 10px; font-size: 11px; color: var(--muted); cursor: pointer; align-items: flex-start;">
+            <input type="checkbox" id="terms-accept" style="margin-top: 2px;" required>
+            <span>I accept the <a href="/#verify" style="color: var(--cyan); text-decoration: underline;">Terms & Honesty Standards</a>. I understand that EarnRadar is an information platform and does not promise guaranteed earnings.</span>
+          </label>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn primary" style="width: 100%; margin-top: 14px;">
+          Continue with Email OTP <b>→</b>
+        </button>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted);">
+          Already have an account? <a href="/login" style="color: var(--cyan); font-weight: 700;">Sign in here</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast } from '/js/ui.js';
+
+    await initNavbar('/signup');
+
+    const form = document.getElementById('signup-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fullName = document.getElementById('full-name').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const termsAccepted = document.getElementById('terms-accept').checked;
+
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match.', 'error');
+        return;
+      }
+
+      if (password.length < 8) {
+        showToast('Password must be at least 8 characters.', 'error');
+        return;
+      }
+
+      if (!termsAccepted) {
+        showToast('Please accept the Terms and Honesty Standards.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Sending OTP code...';
+
+      try {
+        const otpRes = await API.requestOTP(email, 'SIGNUP');
+        if (otpRes.success) {
+          // Store temporary signup payload in session storage for verification step
+          sessionStorage.setItem('earnradar_pending_signup', JSON.stringify({
+            fullName,
+            email,
+            password,
+            termsAccepted
+          }));
+
+          showToast('Verification code sent to your email!', 'success');
+          setTimeout(() => {
+            window.location.href = `/verify-email?email=${encodeURIComponent(email)}&purpose=SIGNUP`;
+          }, 600);
+        } else {
+          showToast(otpRes.error || 'Failed to send OTP code.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Continue with Email OTP <b>→</b>';
+        }
+      } catch (err) {
+        showToast(err.message || 'Network error.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Continue with Email OTP <b>→</b>';
+      }
+    });
+  </script>
+</body>
+</html>

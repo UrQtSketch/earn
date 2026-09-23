@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports Queue — EarnRadar Admin</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow" style="color: var(--red);"><i></i> COMMUNITY SAFETY QUEUE</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">Scam &amp; Abuse Reports</h1>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link active">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link">📜 Audit Log</a>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Reporter</th>
+            <th>Reason</th>
+            <th>Target</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="reports-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">Loading reports...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/admin/reports');
+
+    async function loadReports() {
+      const tbody = document.getElementById('reports-tbody');
+      try {
+        const res = await API.getAdminReports();
+        if (res.success && res.reports?.length > 0) {
+          tbody.innerHTML = res.reports.map(r => `
+            <tr>
+              <td>
+                <b>${escapeHtml(r.reporter?.profile?.fullName || 'User')}</b>
+                <div style="font-size: 10px; color: var(--muted);">${formatTimeAgo(r.createdAt)}</div>
+              </td>
+              <td><b style="color: var(--red); font-size: 12px;">${r.reason}</b></td>
+              <td>${r.targetType} (#${r.targetId.slice(0, 8)})</td>
+              <td><p style="font-size: 11px; color: var(--muted); max-width: 300px;">${escapeHtml(r.details || 'No details provided.')}</p></td>
+              <td><span class="status-pill ${r.status.toLowerCase()}">${r.status}</span></td>
+              <td style="text-align: right;">
+                ${r.status === 'OPEN' ? `
+                  <button class="btn danger sm resolve-btn" data-id="${r.id}" data-action="ACTION_TAKEN">Take Action</button>
+                  <button class="btn secondary sm resolve-btn" data-id="${r.id}" data-action="DISMISSED">Dismiss</button>
+                ` : '<span style="font-size:11px; color:var(--muted);">Resolved</span>'}
+              </td>
+            </tr>
+          `).join('');
+
+          document.querySelectorAll('.resolve-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const id = btn.getAttribute('data-id');
+              const action = btn.getAttribute('data-action');
+              const res = await API.resolveAdminReport(id, action, 'Audited by moderator');
+              if (res.success) {
+                showToast(res.message, 'success');
+                loadReports();
+              }
+            });
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--green);">✓ No active reports in the moderation queue.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadReports();
+  </script>
+</body>
+</html>

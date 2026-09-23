@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earning Claims Review — EarnRadar Admin</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow"><i></i> INCOME VERIFICATION SYSTEM</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">Reported Earning Claims Review</h1>
+        <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+          Inspect evidence attachments, time spent, and audit claims before setting verification status.
+        </p>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link active">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link">📜 Audit Log</a>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Reported Amount</th>
+            <th>Period &amp; Time Spent</th>
+            <th>Evidence</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="claims-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">Loading earning claims...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Claim Review Modal -->
+  <div class="modal-overlay" id="claim-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-claim-modal">✕</button>
+      <div class="eyebrow"><i></i> CLAIM AUDITOR</div>
+      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Update Verification Status</h2>
+
+      <div id="claim-modal-info" style="margin-bottom: 20px; font-size: 13px; line-height: 1.6;"></div>
+
+      <div class="form-group">
+        <label class="form-label">Set Verification Status</label>
+        <select id="claim-status-select" class="select">
+          <option value="UNVERIFIED">UNVERIFIED (No proof or ambiguous proof)</option>
+          <option value="USER_REPORTED">USER_REPORTED (Self-reported figure)</option>
+          <option value="EVIDENCE_REVIEWED">EVIDENCE_REVIEWED (Screenshots &amp; receipts inspected)</option>
+          <option value="VERIFIED_SOURCE">VERIFIED_SOURCE (Direct bank/platform official verification)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Moderator Audit Note</label>
+        <input type="text" id="claim-admin-note" class="input" placeholder="e.g. Invoices and transaction timeline verified.">
+      </div>
+
+      <button id="save-claim-btn" class="btn primary" style="width: 100%; margin-top: 14px;">Update Claim Status <b>✓</b></button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/admin/claims');
+
+    let allClaims = [];
+    let selectedClaim = null;
+
+    async function loadClaims() {
+      const tbody = document.getElementById('claims-tbody');
+      try {
+        const res = await API.getAdminClaims();
+        if (res.success && res.claims?.length > 0) {
+          allClaims = res.claims;
+          tbody.innerHTML = res.claims.map(c => `
+            <tr>
+              <td>
+                <b>${escapeHtml(c.user?.profile?.fullName || 'User')}</b>
+                <div style="font-size: 10px; color: var(--cyan);">@${escapeHtml(c.user?.profile?.username || 'user')}</div>
+              </td>
+              <td><strong style="font: 700 16px var(--font-heading); color: var(--green);">${formatCurrency(c.amount)}</strong></td>
+              <td>
+                <div>${escapeHtml(c.period || 'Recent')}</div>
+                <small style="color: var(--muted);">${c.hoursSpent || 0} hrs spent (${c.attemptsCount || 1} attempts)</small>
+              </td>
+              <td>
+                ${c.evidenceUrl ? `<a href="${c.evidenceUrl}" target="_blank" style="color: var(--cyan); text-decoration: underline;">View Attached Proof ↗</a>` : '<span style="color: var(--muted);">None</span>'}
+              </td>
+              <td><span class="status-pill ${c.status.toLowerCase()}">${c.status}</span></td>
+              <td style="text-align: right;">
+                <button class="btn secondary sm audit-btn" data-id="${c.id}">Audit Status</button>
+              </td>
+            </tr>
+          `).join('');
+
+          document.querySelectorAll('.audit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              const claim = allClaims.find(item => item.id === id);
+              if (claim) openClaimModal(claim);
+            });
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">No earning claims reported yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const claimModal = document.getElementById('claim-modal');
+    document.getElementById('close-claim-modal').addEventListener('click', () => claimModal.classList.remove('show'));
+
+    function openClaimModal(claim) {
+      selectedClaim = claim;
+      document.getElementById('claim-modal-info').innerHTML = `
+        User: <b>${escapeHtml(claim.user?.profile?.fullName)}</b> (@${escapeHtml(claim.user?.profile?.username)})<br>
+        Claimed Amount: <b style="color: var(--green); font-size: 16px;">${formatCurrency(claim.amount)}</b><br>
+        Period: <b>${escapeHtml(claim.period || 'N/A')}</b> • Time: <b>${claim.hoursSpent || 0} hours</b>
+      `;
+      document.getElementById('claim-status-select').value = claim.status;
+      document.getElementById('claim-admin-note').value = claim.adminNote || '';
+      claimModal.classList.add('show');
+    }
+
+    document.getElementById('save-claim-btn').addEventListener('click', async () => {
+      if (!selectedClaim) return;
+      const status = document.getElementById('claim-status-select').value;
+      const adminNote = document.getElementById('claim-admin-note').value.trim();
+
+      const res = await API.updateAdminClaim(selectedClaim.id, status, adminNote);
+      if (res.success) {
+        showToast('Claim status updated!', 'success');
+        claimModal.classList.remove('show');
+        loadClaims();
+      } else {
+        showToast(res.error || 'Failed to update.', 'error');
+      }
+    });
+
+    loadClaims();
+  </script>
+</body>
+</html>

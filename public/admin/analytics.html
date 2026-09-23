@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Analytics — EarnRadar Admin</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow"><i></i> PLATFORM METRICS</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">Analytics &amp; Reported Activity</h1>
+        <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+          Honest breakdown of user participation, category activity, and community-reported earnings.
+        </p>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link active">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link">📜 Audit Log</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <small>ACTIVE MEMBERS</small>
+        <strong id="an-users">0</strong>
+        <span>Registered accounts</span>
+      </div>
+      <div class="stat-box">
+        <small>VERIFIED OPPORTUNITIES</small>
+        <strong id="an-opps">0</strong>
+        <span>Live on radar</span>
+      </div>
+      <div class="stat-box">
+        <small>SUCCESSFUL COLLABORATIONS</small>
+        <strong id="an-collabs" style="color: var(--cyan);">0</strong>
+        <span>Partner connections</span>
+      </div>
+      <div class="stat-box">
+        <small>TOTAL USER-REPORTED EARNINGS</small>
+        <strong id="an-earnings" style="color: var(--green);">₹0</strong>
+        <span><b id="an-claims-count">0</b> verified claims</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+      <!-- Category Breakdown -->
+      <div class="card">
+        <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Activity by Category</h3>
+        <div id="category-stats-list" style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="color: var(--muted); font-size: 12px;">Loading categories...</div>
+        </div>
+      </div>
+
+      <!-- Top Opportunities by Joins -->
+      <div class="card">
+        <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Most Joined Opportunities</h3>
+        <div id="top-opps-list" style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="color: var(--muted); font-size: 12px;">Loading opportunities...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/admin/analytics');
+
+    async function loadAnalytics() {
+      try {
+        const res = await API.getAnalytics();
+        if (res.success && res.analytics) {
+          const a = res.analytics;
+          document.getElementById('an-users').textContent = a.activeMembers;
+          document.getElementById('an-opps').textContent = a.totalOpportunities;
+          document.getElementById('an-collabs').textContent = a.successfulCollaborations;
+          document.getElementById('an-earnings').textContent = formatCurrency(a.totalReportedEarnings);
+          document.getElementById('an-claims-count').textContent = a.reportedClaimsCount;
+
+          // Render Categories
+          const catList = document.getElementById('category-stats-list');
+          catList.innerHTML = a.topCategories.map(c => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.01);">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 18px;">${c.icon || '⚡'}</span>
+                <b style="font-size: 13px;">${escapeHtml(c.name)}</b>
+              </div>
+              <span class="status-pill submitted">${c.count} live</span>
+            </div>
+          `).join('');
+
+          // Render Top Opportunities
+          const oppList = document.getElementById('top-opps-list');
+          oppList.innerHTML = a.topOpportunities.map(o => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.01);">
+              <div>
+                <b style="font-size: 13px;">${escapeHtml(o.title)}</b>
+                <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">${escapeHtml(o.category?.name || 'General')}</div>
+              </div>
+              <strong style="font-size: 13px; color: var(--green);">${o.joinsCount} joined</strong>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadAnalytics();
+  </script>
+</body>
+</html>

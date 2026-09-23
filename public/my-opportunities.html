@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joined Opportunities — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div style="margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 24px;">
+      <div class="eyebrow"><i></i> ACTIVE PARTICIPATION</div>
+      <h1 style="font: 700 clamp(28px, 3.5vw, 42px) var(--font-heading);">
+        My Joined Opportunities
+      </h1>
+      <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+        Review action checklists, official sources, and active collaborators for your joined methods.
+      </p>
+    </div>
+
+    <div id="joined-container" class="opportunity-list">
+      <div style="padding: 40px; text-align: center; color: var(--muted);">Loading joined opportunities...</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/my-opportunities');
+
+    async function loadJoinedOpps() {
+      const container = document.getElementById('joined-container');
+      try {
+        const res = await API.getProfile();
+        if (res.success && res.user && res.user.memberships?.length > 0) {
+          container.innerHTML = res.user.memberships.map(m => {
+            const opp = m.opportunity;
+            return `
+              <article class="opportunity" style="border-color: rgba(125,255,178,0.2);">
+                <div class="opp-icon green">✓</div>
+                <div class="opp-body">
+                  <div class="tags">
+                    <span class="verified">JOINED</span>
+                    <span>${escapeHtml(opp.category?.name || 'General')}</span>
+                    <em>Joined ${formatTimeAgo(m.joinedAt)}</em>
+                  </div>
+                  <h3>${escapeHtml(opp.title)}</h3>
+                  <p>${escapeHtml(opp.description)}</p>
+                  <div class="meta">
+                    <span>⏱ ${escapeHtml(opp.timeRequired || 'Flexible')}</span>
+                    <span>💰 ${escapeHtml(opp.potentialEarning || 'Variable')}</span>
+                  </div>
+                </div>
+                <div class="opp-value">
+                  <a class="btn primary sm" href="/opportunities/${opp.slug}">View Checklist →</a>
+                  <button class="btn secondary sm leave-btn" data-id="${opp.id}" style="margin-top: 8px;">Leave</button>
+                </div>
+              </article>
+            `;
+          }).join('');
+
+          document.querySelectorAll('.leave-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              const id = btn.getAttribute('data-id');
+              try {
+                const leaveRes = await API.leaveOpportunity(id);
+                if (leaveRes.success) {
+                  showToast('Left opportunity', 'info');
+                  loadJoinedOpps();
+                }
+              } catch (err) {
+                showToast(err.message, 'error');
+              }
+            });
+          });
+        } else {
+          container.innerHTML = `
+            <div class="card" style="padding: 40px; text-align: center;">
+              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 8px;">You haven't joined any opportunities yet</h3>
+              <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">Explore the radar and join opportunities to follow step guides and connect with collaborators.</p>
+              <a class="btn primary sm" href="/opportunities">Explore Opportunities</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--red);">Failed to load joined opportunities.</div>';
+      }
+    }
+
+    loadJoinedOpps();
+  </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EarnRadar — discover, verify and track online earning opportunities.">
+  <title>EarnRadar — Find. Verify. Decide.</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root{
+  --bg:#05070b;--panel:#0b1018;--panel2:#101722;--line:rgba(255,255,255,.085);
+  --text:#f5f7fb;--muted:#8b96a8;--green:#7dffb2;--cyan:#67e8ff;
+  --purple:#9b7cff;--pink:#ff78b8;--yellow:#ffd86b;--red:#ff718b
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+.grid-bg{position:fixed;inset:0;z-index:-5;opacity:.24;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(#000,transparent 90%)}
+.ambient{position:fixed;width:430px;height:430px;border-radius:50%;filter:blur(120px);opacity:.09;z-index:-4;pointer-events:none}.ambient-one{left:-220px;top:12%;background:var(--purple)}.ambient-two{right:-220px;top:45%;background:var(--cyan)}
+.topbar{width:min(1420px,calc(100% - 48px));height:78px;margin:auto;display:flex;align-items:center;gap:38px;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font:700 20px "Space Grotesk"}.logo>span:last-child span{color:var(--cyan)}
+.logo-mark{width:33px;height:33px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#06100e}
+nav{display:flex;gap:25px;margin-right:auto}nav a{font-size:13px;color:var(--muted);font-weight:600}nav a:hover,nav a.active{color:#fff}
+.submit-link{font-size:12px;color:var(--green);padding:10px 14px;border:1px solid rgba(125,255,178,.2);border-radius:10px;background:rgba(125,255,178,.055)}
+main{width:min(1420px,calc(100% - 48px));margin:auto}
+.hero{min-height:700px;padding:75px 55px;display:grid;grid-template-columns:1.06fr .94fr;align-items:center;gap:75px}
+.eyebrow,.section small,.card-top small,.tags span,.opp-value small{font-size:9px;letter-spacing:1.7px;font-weight:800;color:var(--cyan)}
+.eyebrow{display:flex;gap:9px;align-items:center;margin-bottom:23px}.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 15px var(--green)}
+.hero h1{font:700 clamp(50px,6.5vw,84px)/.96 "Space Grotesk";letter-spacing:-4px}.hero h1 span{color:var(--cyan)}
+.hero-copy>p{max-width:650px;margin:27px 0;color:var(--muted);font-size:15px;line-height:1.75}
+.hero-actions{display:flex;gap:11px;margin-bottom:38px}.btn{min-height:46px;padding:0 17px;display:inline-flex;align-items:center;justify-content:center;gap:13px;border-radius:11px;font-size:12px;font-weight:800;transition:.2s}.btn.primary{color:#04100b;background:var(--green);box-shadow:0 0 30px rgba(125,255,178,.12)}.btn.primary:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(125,255,178,.22)}.btn.secondary{border:1px solid var(--line);background:rgba(255,255,255,.025)}
+.mini-stats{display:flex;gap:34px}.mini-stats div{display:flex;flex-direction:column;gap:4px}.mini-stats strong{font:700 20px "Space Grotesk"}.mini-stats span{font-size:10px;color:var(--muted)}
+.radar-card{max-width:520px;margin:auto;padding:25px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,rgba(16,23,34,.94),rgba(6,9,14,.94));box-shadow:0 35px 100px rgba(0,0,0,.35)}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.card-top h2{font:600 19px "Space Grotesk";margin-top:7px}.live{font-size:9px;color:var(--green);padding:7px 9px;border-radius:99px;background:rgba(125,255,178,.07)}.live i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:5px}
+.radar{position:relative;width:min(100%,350px);aspect-ratio:1;margin:auto;border:1px solid rgba(103,232,255,.14);border-radius:50%;background:radial-gradient(circle,rgba(103,232,255,.055),transparent 67%);overflow:hidden}.circle{position:absolute;border:1px solid rgba(103,232,255,.13);border-radius:50%}.c1{inset:14%}.c2{inset:29%}.c3{inset:43%}.radar-line{position:absolute;background:rgba(103,232,255,.08)}.horizontal{height:1px;width:100%;top:50%}.vertical{height:100%;width:1px;left:50%}
+.sweep{position:absolute;width:50%;height:50%;left:50%;top:0;transform-origin:bottom left;background:linear-gradient(45deg,rgba(103,232,255,.22),transparent 70%);clip-path:polygon(0 100%,100% 0,0 0);animation:sweep 4s linear infinite}@keyframes sweep{to{transform:rotate(360deg)}}
+.signal{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}.s1{left:67%;top:27%}.s2{left:28%;top:62%;background:var(--cyan);box-shadow:0 0 18px var(--cyan)}.s3{left:58%;top:73%;background:var(--purple);box-shadow:0 0 18px var(--purple)}
+.radar-core{position:absolute;inset:42%;display:grid;place-items:center;border:1px solid rgba(125,255,178,.4);border-radius:50%;background:#08120f;color:var(--green);font:700 22px "Space Grotesk"}
+.radar-footer{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:16px;margin-top:21px}.radar-footer div{display:flex;flex-direction:column;gap:4px}.radar-footer small{font-size:8px;color:#697486}.radar-footer b{font:700 18px "Space Grotesk"}
+.section{padding:84px 55px}.section-head,.feed-head{display:flex;justify-content:space-between;gap:30px;align-items:end}.section-head h2,.feed-head h2,.verify h2,.center-head h2,.submit-box h2{font:600 clamp(30px,4vw,48px)/1.05 "Space Grotesk";letter-spacing:-1.8px;margin-top:9px}.section-head>p{color:var(--muted);font-size:12px}
+.category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:32px}.category{min-height:135px;padding:21px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.018);transition:.2s}.category:hover,.category.active{border-color:rgba(103,232,255,.23);background:rgba(103,232,255,.035);transform:translateY(-2px)}.category>span{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:rgba(255,255,255,.045)}.category b{font:600 15px "Space Grotesk"}.category p{margin-top:6px;color:var(--muted);font-size:11px;line-height:1.45}.category>strong{color:#657082;font:600 12px "Space Grotesk"}
+.feed{border-top:1px solid var(--line)}.filters{display:flex;gap:6px;flex-wrap:wrap}.filters button{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);font:600 10px "DM Sans"}.filters .selected{color:var(--green);border-color:rgba(125,255,178,.25);background:rgba(125,255,178,.07)}
+.opportunity-list{display:grid;gap:10px;margin-top:27px}.opportunity{display:grid;grid-template-columns:50px 1fr 225px;gap:16px;padding:22px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.017);transition:.2s}.opportunity:hover{border-color:rgba(255,255,255,.17);background:rgba(255,255,255,.025)}.featured{border-color:rgba(125,255,178,.2)}.opp-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:13px;font-size:20px}.purple{background:rgba(155,124,255,.1)}.cyan{background:rgba(103,232,255,.09)}.pink{background:rgba(255,120,184,.09)}.green{background:rgba(125,255,178,.09);color:var(--green);font-weight:800}
+.tags{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.tags span{padding:4px 7px;background:rgba(255,255,255,.045);border-radius:5px;font-size:7px;color:var(--muted);letter-spacing:.8px}.tags .verified{color:var(--green);background:rgba(125,255,178,.07)}.tags .checked{color:var(--yellow);background:rgba(255,216,107,.07)}.tags .research{color:var(--cyan);background:rgba(103,232,255,.07)}.tags em{font-style:normal;color:#606b7b;font-size:9px}
+.opp-body h3{font:600 17px "Space Grotesk";margin:9px 0 6px}.opp-body>p{max-width:760px;color:var(--muted);font-size:11px;line-height:1.6}.meta{display:flex;gap:15px;margin-top:11px;color:#657082;font-size:9px}
+.opp-value{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;border-left:1px solid var(--line);padding-left:20px}.opp-value small{color:#657082;letter-spacing:1.1px}.opp-value strong{font:700 18px "Space Grotesk";color:var(--green);margin:5px 0}.opp-value label{font-size:7px;letter-spacing:.7px;color:var(--yellow);padding:4px 6px;background:rgba(255,216,107,.06);border-radius:4px}.opp-value label.danger{color:var(--red);background:rgba(255,113,139,.06)}.opp-value a{margin-top:13px;color:var(--cyan);font-size:10px;font-weight:700}
+.verify{display:grid;grid-template-columns:1fr 410px;gap:100px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.verify h2 span{color:var(--cyan)}.verify>div>p{max-width:700px;color:var(--muted);font-size:13px;line-height:1.7;margin-top:17px}.checks{display:grid;gap:15px;margin-top:28px}.checks>div{display:flex;gap:12px}.checks b{width:23px;height:23px;display:grid;place-items:center;border-radius:50%;background:rgba(125,255,178,.09);color:var(--green);font-size:11px}.checks strong{font-size:12px}.checks small{display:block;margin-top:3px;color:var(--muted);font-size:10px;letter-spacing:0}
+.trust-card{padding:29px;border:1px solid rgba(103,232,255,.17);border-radius:21px;background:linear-gradient(145deg,rgba(103,232,255,.045),rgba(255,255,255,.012))}.shield{width:47px;height:47px;display:grid;place-items:center;border-radius:13px;background:rgba(125,255,178,.08);color:var(--green);font-weight:900;margin-bottom:22px}.trust-card>small{font-size:8px;letter-spacing:1.5px;color:var(--cyan);font-weight:800}.trust-card h3{font:600 23px/1.2 "Space Grotesk";margin:10px 0 24px}.trust-row{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:11px 0;font-size:10px}.trust-row span{color:var(--muted)}.trust-row b{color:var(--green)}.warning{padding:12px;margin-top:17px;border:1px solid rgba(255,216,107,.13);border-radius:9px;background:rgba(255,216,107,.025)}.warning b{font-size:9px;color:var(--yellow)}.warning p{margin-top:4px;color:#8e8976;font-size:9px;line-height:1.5}
+.center-head{text-align:center}.center-head p{margin-top:10px;color:var(--muted);font-size:12px}.steps{display:grid;grid-template-columns:1fr 45px 1fr 45px 1fr 45px 1fr;align-items:center;margin-top:47px}.step{text-align:center}.step>span{font:700 10px "Space Grotesk";color:#4f5969}.step i{width:51px;height:51px;display:grid;place-items:center;margin:11px auto 13px;border:1px solid var(--line);border-radius:14px;background:rgba(103,232,255,.035);color:var(--cyan);font-style:normal}.step h3{font:600 15px "Space Grotesk"}.step p{max-width:185px;margin:6px auto;color:var(--muted);font-size:10px;line-height:1.55}.connector{height:1px;background:linear-gradient(90deg,transparent,rgba(103,232,255,.25),transparent)}
+.submit-box{padding:43px;display:flex;align-items:center;justify-content:space-between;gap:25px;border:1px solid rgba(125,255,178,.16);border-radius:21px;background:radial-gradient(circle at 80% 50%,rgba(125,255,178,.07),transparent 30%),rgba(125,255,178,.018)}.submit-box p{max-width:720px;margin-top:10px;color:var(--muted);font-size:11px;line-height:1.6}
+.disclaimer{margin:0 55px 60px;padding:17px;display:flex;gap:12px;border:1px solid rgba(255,216,107,.12);border-radius:12px;background:rgba(255,216,107,.02)}.disclaimer>b{color:var(--yellow)}.disclaimer p{color:#8e8978;font-size:9px;line-height:1.6}.disclaimer strong{color:var(--yellow)}
+footer{width:min(1420px,calc(100% - 48px));min-height:90px;margin:auto;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;color:#626d7d;font-size:9px}.footer-logo{display:flex;align-items:center;gap:8px;color:#fff}.footer-logo .logo-mark{width:25px;height:25px;border-radius:7px;font-size:11px}
+@media(max-width:1050px){nav{display:none}.hero{grid-template-columns:1fr}.radar-card{margin:0}.category-grid{grid-template-columns:repeat(2,1fr)}.verify{grid-template-columns:1fr;gap:45px}.steps{grid-template-columns:1fr 1fr;gap:35px}.connector{display:none}}
+@media(max-width:700px){.topbar,main,footer{width:calc(100% - 28px)}.topbar{height:65px}.submit-link{font-size:10px;padding:8px}.hero,.section{padding-left:3px;padding-right:3px}.hero{padding-top:55px}.hero h1{font-size:48px;letter-spacing:-2.5px}.category-grid{grid-template-columns:1fr}.section-head,.feed-head{align-items:flex-start;flex-direction:column}.opportunity{grid-template-columns:48px 1fr}.opp-value{grid-column:1/-1;align-items:flex-start;border-left:0;border-top:1px solid var(--line);padding:16px 0 0}.verify{padding-left:3px;padding-right:3px}.steps{grid-template-columns:1fr}.submit-box{align-items:flex-start;flex-direction:column;padding:28px}.disclaimer{margin-left:3px;margin-right:3px}footer{padding:20px 0;flex-direction:column;align-items:flex-start;gap:10px}}
+
+</style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar">
+    <a class="logo" href="#">
+      <span class="logo-mark">↗</span>
+      <span>Earn<span>Radar</span></span>
+    </a>
+
+    <nav>
+      <a class="active" href="#discover">Discover</a>
+      <a href="#feed">Opportunities</a>
+      <a href="#categories">Categories</a>
+      <a href="#verify">Verification</a>
+      <a href="#how">How it works</a>
+    </nav>
+
+    <a class="submit-link" href="#submit">+ Share opportunity</a>
+  </header>
+
+  <main>
+    <section class="hero" id="discover">
+      <div class="hero-copy">
+        <div class="eyebrow"><i></i> COMMUNITY EARNING RADAR • LIVE</div>
+        <h1>Find ways to earn.<br><span>Know the reality.</span></h1>
+        <p>
+          One place to discover online earning opportunities — gaming, freelancing,
+          creator programs, reselling, rewards and financial ideas — with the
+          requirements, effort, costs, risks and sources shown clearly.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#feed">Explore opportunities <b>→</b></a>
+          <a class="btn secondary" href="#submit">Share a method</a>
+        </div>
+
+        <div class="mini-stats">
+          <div><strong>128</strong><span>listed</span></div>
+          <div><strong>42</strong><span>source checked</span></div>
+          <div><strong>18</strong><span>added today</span></div>
+        </div>
+      </div>
+
+      <div class="radar-shell">
+        <div class="radar-card">
+          <div class="card-top">
+            <div>
+              <small>OPPORTUNITY RADAR</small>
+              <h2>What people are watching</h2>
+            </div>
+            <span class="live"><i></i> LIVE</span>
+          </div>
+
+          <div class="radar">
+            <div class="radar-line horizontal"></div>
+            <div class="radar-line vertical"></div>
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+            <div class="circle c3"></div>
+            <div class="sweep"></div>
+            <span class="signal s1"></span>
+            <span class="signal s2"></span>
+            <span class="signal s3"></span>
+            <div class="radar-core">₹</div>
+          </div>
+
+          <div class="radar-footer">
+            <div><small>NEW</small><b>18</b></div>
+            <div><small>CHECKED</small><b>42</b></div>
+            <div><small>CATEGORIES</small><b>09</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="categories section" id="categories">
+      <div class="section-head">
+        <div>
+          <small>EXPLORE</small>
+          <h2>There is more than one way to earn.</h2>
+        </div>
+        <p>Choose by skill, effort, capital, time or risk.</p>
+      </div>
+
+      <div class="category-grid">
+        <article class="category active"><span>🎮</span><div><b>Gaming</b><p>Tournaments, rewards & competitive opportunities</p></div><strong>24</strong></article>
+        <article class="category"><span>⌨</span><div><b>Freelancing</b><p>Remote work, gigs, services & micro tasks</p></div><strong>31</strong></article>
+        <article class="category"><span>▶</span><div><b>Creator</b><p>Content, affiliate & creator programs</p></div><strong>17</strong></article>
+        <article class="category"><span>₹</span><div><b>Finance</b><p>Research, investing & market opportunities</p></div><strong>12</strong></article>
+        <article class="category"><span>🛒</span><div><b>Reselling</b><p>Marketplaces, deals & commerce ideas</p></div><strong>15</strong></article>
+        <article class="category"><span>⚡</span><div><b>Quick Gigs</b><p>Short tasks with clear requirements</p></div><strong>09</strong></article>
+      </div>
+    </section>
+
+    <section class="feed section" id="feed">
+      <div class="feed-head">
+        <div><small>THE FEED</small><h2>Fresh opportunities, explained.</h2></div>
+        <div class="filters"><button class="selected">All</button><button>Gaming</button><button>Freelance</button><button>Creator</button><button>Finance</button></div>
+      </div>
+
+      <div class="opportunity-list">
+        <article class="opportunity featured">
+          <div class="opp-icon purple">🎮</div>
+          <div class="opp-body">
+            <div class="tags"><span class="verified">VERIFIED</span><span>GAMING</span><em>42 min ago</em></div>
+            <h3>Community Gaming Tournament Rewards</h3>
+            <p>Compete in eligible tournaments and earn published prizes according to the event rules. Entry requirements, schedule and prize pool should be checked before joining.</p>
+            <div class="meta"><span>⏱ 2–4 hrs/event</span><span>🎯 Skill-based</span><span>🌎 Online</span></div>
+          </div>
+          <div class="opp-value"><small>POTENTIAL REWARD</small><strong>₹500–₹10K+</strong><label>VARIABLE / EVENT BASED</label><a href="#">View details →</a></div>
+        </article>
+
+        <article class="opportunity">
+          <div class="opp-icon cyan">⌨</div>
+          <div class="opp-body">
+            <div class="tags"><span class="verified">VERIFIED</span><span>FREELANCE</span><em>2 hrs ago</em></div>
+            <h3>Short-form Video Editing Gigs</h3>
+            <p>Offer editing for Reels, Shorts and social clips. Earnings depend on skill, client demand, portfolio quality and the agreed project rate.</p>
+            <div class="meta"><span>⏱ 1–3 hrs/order</span><span>🧠 Skill-based</span><span>🌎 Remote</span></div>
+          </div>
+          <div class="opp-value"><small>TYPICAL PROJECT</small><strong>₹300–₹5K+</strong><label>SKILL + CLIENT DEPENDENT</label><a href="#">View details →</a></div>
+        </article>
+
+        <article class="opportunity">
+          <div class="opp-icon pink">▶</div>
+          <div class="opp-body">
+            <div class="tags"><span class="checked">CHECKED</span><span>CREATOR</span><em>Today</em></div>
+            <h3>Affiliate Content Opportunity</h3>
+            <p>Create useful content around products or services that offer legitimate affiliate programs. Commission depends on traffic, conversions and program terms.</p>
+            <div class="meta"><span>⏱ Long-term</span><span>📣 Audience helps</span><span>🌎 Online</span></div>
+          </div>
+          <div class="opp-value"><small>EARNING MODEL</small><strong>Commission</strong><label>NO GUARANTEE</label><a href="#">View details →</a></div>
+        </article>
+
+        <article class="opportunity">
+          <div class="opp-icon green">₹</div>
+          <div class="opp-body">
+            <div class="tags"><span class="research">RESEARCH</span><span>FINANCE</span><em>Updated today</em></div>
+            <h3>Market / Investment Research Idea</h3>
+            <p>Educational market research with sources, assumptions, time horizon and downside risks shown separately. This is not a guaranteed-return recommendation.</p>
+            <div class="meta"><span>📚 Research first</span><span>⚠ Capital at risk</span><span>🇮🇳 India</span></div>
+          </div>
+          <div class="opp-value"><small>RETURN</small><strong>Not guaranteed</strong><label class="danger">CAPITAL RISK</label><a href="#">View research →</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="verify section" id="verify">
+      <div>
+        <small>THE TRUST LAYER</small>
+        <h2>Don't just share a method.<br><span>Show the whole picture.</span></h2>
+        <p>
+          Every listing can explain where it came from, what it needs, how much
+          effort it takes, what it costs, what can go wrong and whether earnings
+          are guaranteed (usually, they are not).
+        </p>
+
+        <div class="checks">
+          <div><b>✓</b><span><strong>Source shown</strong><small>Users can trace where the information came from.</small></span></div>
+          <div><b>✓</b><span><strong>Costs disclosed</strong><small>Entry fees, tools or capital requirements are visible.</small></span></div>
+          <div><b>✓</b><span><strong>Risk disclosed</strong><small>Financial and practical downside is not hidden.</small></span></div>
+          <div><b>✓</b><span><strong>Requirements clear</strong><small>Skills, eligibility, time and location are listed.</small></span></div>
+        </div>
+      </div>
+
+      <aside class="trust-card">
+        <div class="shield">✓</div>
+        <small>LISTING STANDARD</small>
+        <h3>Trust is a process,<br>not a green badge.</h3>
+        <div class="trust-row"><span>Source</span><b>Documented</b></div>
+        <div class="trust-row"><span>Risk</span><b>Disclosed</b></div>
+        <div class="trust-row"><span>Evidence</span><b>Attached</b></div>
+        <div class="warning"><b>⚠ No guaranteed earnings</b><p>Results vary. Users should verify terms independently before paying, investing or sharing sensitive information.</p></div>
+      </aside>
+    </section>
+
+    <section class="how section" id="how">
+      <div class="center-head"><small>THE LOOP</small><h2>Discover → Verify → Decide.</h2><p>Built to help people act with information, not hype.</p></div>
+      <div class="steps">
+        <div class="step"><span>01</span><i>⌕</i><h3>Discover</h3><p>Find an opportunity that matches your skills, time and budget.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>02</span><i>✓</i><h3>Verify</h3><p>Check source, terms, requirements, cost, risk and evidence.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>03</span><i>↗</i><h3>Decide</h3><p>Choose whether it makes sense for your own situation.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>04</span><i>＋</i><h3>Share</h3><p>Found something real? Add it with the full details.</p></div>
+      </div>
+    </section>
+
+    <section class="submit section" id="submit">
+      <div class="submit-box">
+        <div><small>COMMUNITY RADAR</small><h2>Found a method worth researching?</h2><p>Share the source, steps, requirements, cost, realistic earning model and risks. Make the next person's decision easier.</p></div>
+        <a class="btn primary" href="#">Submit opportunity <b>↗</b></a>
+      </div>
+    </section>
+
+    <div class="disclaimer">
+      <b>⚠</b>
+      <p><strong>Important:</strong> EarnRadar is an information and discovery platform, not a guarantee of income. Investment and money-related opportunities can involve loss of capital. Never pay an unknown person, share OTPs/passwords, or trust a guaranteed-return claim without independent verification.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>Discover smarter. Verify harder. Decide for yourself.</span>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+</body>
+</html>

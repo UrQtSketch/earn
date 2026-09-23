@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="max-width: 700px; padding: 40px 0 80px;">
+    <div style="margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 20px;">
+      <div class="eyebrow"><i></i> PREFERENCES &amp; SECURITY</div>
+      <h1 style="font: 700 32px var(--font-heading);">Account Settings</h1>
+    </div>
+
+    <form id="profile-settings-form" class="card" style="padding: 32px;">
+      <h2 style="font: 700 18px var(--font-heading); margin-bottom: 20px;">Edit Profile Information</h2>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="set-fullname" class="input" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bio</label>
+        <textarea id="set-bio" class="textarea" placeholder="Tell the community about your expertise..." style="min-height: 80px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Country / Location</label>
+        <input type="text" id="set-country" class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Skills <small>(comma separated)</small></label>
+        <input type="text" id="set-skills" class="input" placeholder="e.g. Video Editing, UI Design, Content">
+      </div>
+
+      <div class="form-group" style="margin: 20px 0;">
+        <label style="display: flex; gap: 10px; align-items: center; cursor: pointer;">
+          <input type="checkbox" id="set-private">
+          <span style="font-size: 13px;">Make profile private (only verified connections can view details)</span>
+        </label>
+      </div>
+
+      <button type="submit" id="save-settings-btn" class="btn primary" style="width: 100%;">
+        Save Profile Changes <b>✓</b>
+      </button>
+    </form>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast } from '/js/ui.js';
+
+    await initNavbar('/settings');
+
+    async function loadSettings() {
+      const session = await API.getSession();
+      if (!session.authenticated) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const profRes = await API.getProfile();
+      if (profRes.success && profRes.user) {
+        const p = profRes.user.profile || {};
+        document.getElementById('set-fullname').value = p.fullName || '';
+        document.getElementById('set-bio').value = p.bio || '';
+        document.getElementById('set-country').value = p.country || 'India';
+        document.getElementById('set-skills').value = (p.skills || []).join(', ');
+        document.getElementById('set-private').checked = Boolean(p.isPrivate);
+      }
+    }
+
+    document.getElementById('profile-settings-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById('set-fullname').value.trim();
+      const bio = document.getElementById('set-bio').value.trim();
+      const country = document.getElementById('set-country').value.trim();
+      const skills = document.getElementById('set-skills').value.split(',').map(s => s.trim()).filter(Boolean);
+      const isPrivate = document.getElementById('set-private').checked;
+
+      const saveBtn = document.getElementById('save-settings-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = 'Saving...';
+
+      try {
+        const res = await API.updateProfile({
+          fullName,
+          bio,
+          country,
+          skills,
+          isPrivate
+        });
+
+        if (res.success) {
+          showToast('Profile updated successfully!', 'success');
+        } else {
+          showToast(res.error || 'Failed to update profile.', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = 'Save Profile Changes <b>✓</b>';
+      }
+    });
+
+    loadSettings();
+  </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Opportunities — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div style="margin-bottom: 32px;">
+      <div class="eyebrow"><i></i> VERIFIED OPPORTUNITY DIRECTORY</div>
+      <h1 style="font: 700 clamp(32px, 4vw, 48px) var(--font-heading);">
+        Explore earning methods &amp; platforms
+      </h1>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 6px; max-width: 700px;">
+        Filter by skill, effort, capital requirement, and earning model. Every opportunity includes full requirements, risks, and evidence.
+      </p>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="card" style="padding: 20px; margin-bottom: 30px;">
+      <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center;">
+        <input type="text" id="search-input" class="input" placeholder="Search by title, keyword, required skill...">
+
+        <select id="category-select" class="select" style="width: 180px;">
+          <option value="all">All Categories</option>
+          <option value="gaming">Gaming</option>
+          <option value="freelancing">Freelancing</option>
+          <option value="creator">Creator</option>
+          <option value="finance">Finance</option>
+          <option value="reselling">Reselling</option>
+          <option value="quick-gigs">Quick Gigs</option>
+        </select>
+
+        <select id="sort-select" class="select" style="width: 160px;">
+          <option value="latest">Latest Verified</option>
+          <option value="popular">Most Joined</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Opportunity List Feed -->
+    <div class="opportunity-list" id="opportunities-container">
+      <div style="padding: 40px; text-align: center; color: var(--muted);">Loading verified opportunities...</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/opportunities');
+
+    const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('category-select');
+    const sortSelect = document.getElementById('sort-select');
+    const container = document.getElementById('opportunities-container');
+
+    // Parse URL params for pre-selected category
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('category')) {
+      categorySelect.value = urlParams.get('category');
+    }
+
+    async function loadOpportunities() {
+      container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--muted);">Scanning radar...</div>';
+
+      try {
+        const res = await API.getOpportunities({
+          category: categorySelect.value,
+          search: searchInput.value.trim(),
+          sort: sortSelect.value
+        });
+
+        if (res.success && res.opportunities.length > 0) {
+          container.innerHTML = res.opportunities.map(opp => {
+            const iconClass = opp.categorySlug === 'gaming' ? 'purple' : opp.categorySlug === 'freelancing' ? 'cyan' : opp.categorySlug === 'creator' ? 'pink' : 'green';
+            return `
+              <article class="opportunity ${opp.featured ? 'featured' : ''}" onclick="window.location.href='/opportunities/${opp.slug}'" style="cursor: pointer;">
+                <div class="opp-icon ${iconClass}">${opp.categoryIcon || '⚡'}</div>
+                <div class="opp-body">
+                  <div class="tags">
+                    <span class="verified">${opp.status}</span>
+                    <span>${escapeHtml(opp.category)}</span>
+                    <em>${formatTimeAgo(opp.createdAt)}</em>
+                  </div>
+                  <h3>${escapeHtml(opp.title)}</h3>
+                  <p>${escapeHtml(opp.description)}</p>
+                  <div class="meta">
+                    <span>⏱ ${escapeHtml(opp.timeRequired || 'Flexible')}</span>
+                    <span>🧠 ${escapeHtml(opp.skillsRequired?.split(',')[0] || 'Skill-based')}</span>
+                    <span>👥 ${opp.joinsCount} joined</span>
+                    <span>💬 ${opp.commentsCount} comments</span>
+                  </div>
+                </div>
+                <div class="opp-value">
+                  <small>POTENTIAL REWARD</small>
+                  <strong>${escapeHtml(opp.potentialEarning || 'Variable')}</strong>
+                  <label class="${opp.categorySlug === 'finance' ? 'danger' : ''}">${escapeHtml(opp.earningModel || 'MODEL')}</label>
+                  <a href="/opportunities/${opp.slug}">View dossier →</a>
+                </div>
+              </article>
+            `;
+          }).join('');
+        } else {
+          container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--muted);">No opportunities match your search criteria.</div>';
+        }
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--red);">Error loading opportunities.</div>';
+      }
+    }
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(window._searchTimer);
+      window._searchTimer = setTimeout(loadOpportunities, 300);
+    });
+
+    categorySelect.addEventListener('change', loadOpportunities);
+    sortSelect.addEventListener('change', loadOpportunities);
+
+    loadOpportunities();
+  </script>
+</body>
+</html>

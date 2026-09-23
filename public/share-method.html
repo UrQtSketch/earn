@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share a Method — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container wizard-container">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div class="eyebrow" style="justify-content: center;"><i></i> COMMUNITY VERIFICATION WIZARD</div>
+      <h1 style="font: 700 clamp(28px, 3.5vw, 42px) var(--font-heading); margin-top: 8px;">
+        Share an Earning Method
+      </h1>
+      <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+        Provide comprehensive details, requirements, risks, sources, and proof for admin review.
+      </p>
+    </div>
+
+    <!-- Wizard Step Progress -->
+    <div class="wizard-progress">
+      <div class="wizard-step-node active" data-step="1">
+        <div class="circle-num">1</div>
+        <span class="step-title">Basic Info</span>
+      </div>
+      <div class="wizard-step-node" data-step="2">
+        <div class="circle-num">2</div>
+        <span class="step-title">Process</span>
+      </div>
+      <div class="wizard-step-node" data-step="3">
+        <div class="circle-num">3</div>
+        <span class="step-title">Requirements</span>
+      </div>
+      <div class="wizard-step-node" data-step="4">
+        <div class="circle-num">4</div>
+        <span class="step-title">Money</span>
+      </div>
+      <div class="wizard-step-node" data-step="5">
+        <div class="circle-num">5</div>
+        <span class="step-title">Proof</span>
+      </div>
+      <div class="wizard-step-node" data-step="6">
+        <div class="circle-num">6</div>
+        <span class="step-title">Video</span>
+      </div>
+      <div class="wizard-step-node" data-step="7">
+        <div class="circle-num">7</div>
+        <span class="step-title">Safety</span>
+      </div>
+      <div class="wizard-step-node" data-step="8">
+        <div class="circle-num">8</div>
+        <span class="step-title">Sources</span>
+      </div>
+      <div class="wizard-step-node" data-step="9">
+        <div class="circle-num">9</div>
+        <span class="step-title">Experience</span>
+      </div>
+    </div>
+
+    <form id="share-method-form" class="card" style="padding: 36px;">
+      <!-- STEP 1: Basic Information -->
+      <div class="wizard-step-panel active" id="step-panel-1">
+        <div class="eyebrow">STEP 1 OF 9 • BASIC INFORMATION</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">What is this earning method?</h2>
+
+        <div class="form-group">
+          <label class="form-label">Method Title <small>(Clear, descriptive, no clickbait)</small></label>
+          <input type="text" id="m-title" class="input" placeholder="e.g. Technical Documentation Review &amp; Editing for Web3 Tools" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="m-category" class="select" required>
+            <option value="freelancing">Freelancing (Remote work, gigs &amp; micro tasks)</option>
+            <option value="gaming">Gaming (Tournaments &amp; skill rewards)</option>
+            <option value="creator">Creator (Video, audio &amp; content programs)</option>
+            <option value="finance">Finance (Market research &amp; tools)</option>
+            <option value="reselling">Reselling (Commerce &amp; arbitrage)</option>
+            <option value="quick-gigs">Quick Gigs (Short tasks &amp; testing)</option>
+            <option value="affiliate">Affiliate (Transparent attribution)</option>
+            <option value="other">Other / Multi-disciplinary</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Short Description <small>(2-3 sentences explaining the core value proposition)</small></label>
+          <textarea id="m-description" class="textarea" placeholder="Explain what the earner actually does and how the opportunity is structured..." required></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 2: How it Works (Step-by-Step Builder) -->
+      <div class="wizard-step-panel" id="step-panel-2">
+        <div class="eyebrow">STEP 2 OF 9 • HOW IT WORKS</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">Explain exactly how someone can earn</h2>
+
+        <div class="form-group">
+          <label class="form-label">Overview Explanation</label>
+          <textarea id="m-how-overview" class="textarea" placeholder="High-level breakdown of the work cycle..." style="min-height: 80px;"></textarea>
+        </div>
+
+        <label class="form-label" style="margin-top: 20px;">Step-by-Step Action Plan</label>
+        <div id="steps-builder-container">
+          <div class="step-row-item">
+            <div class="step-header">
+              <b style="font-size: 13px; color: var(--cyan);">Step 1</b>
+            </div>
+            <input type="text" class="input step-title-input" placeholder="Step title (e.g. Sign up &amp; pass sample test)" value="Sign up &amp; complete screening test" style="margin-bottom: 8px;">
+            <textarea class="textarea step-desc-input" placeholder="Explain the specific actions for this step..." style="min-height: 60px;">Register on the official portal and submit 2 writing samples for evaluation.</textarea>
+          </div>
+        </div>
+
+        <button type="button" id="add-step-btn" class="btn secondary sm" style="margin-top: 10px;">
+          + Add Next Step
+        </button>
+      </div>
+
+      <!-- STEP 3: Requirements -->
+      <div class="wizard-step-panel" id="step-panel-3">
+        <div class="eyebrow">STEP 3 OF 9 • REQUIREMENTS &amp; ELIGIBILITY</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">What is required to participate?</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Required Skills</label>
+            <input type="text" id="m-skills" class="input" placeholder="e.g. English fluency, Markdown, Figma">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Required Platform/Account</label>
+            <input type="text" id="m-platform-acc" class="input" placeholder="e.g. GitHub account, Discord, PayPal/UPI">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Country Availability</label>
+            <input type="text" id="m-country" class="input" value="India &amp; Global Remote">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Device &amp; Internet</label>
+            <input type="text" id="m-device" class="input" value="Laptop/PC + Stable Internet">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Time Commitment Required</label>
+          <input type="text" id="m-time" class="input" placeholder="e.g. 5–10 hours per week (Flexible)">
+        </div>
+      </div>
+
+      <!-- STEP 4: Money Details -->
+      <div class="wizard-step-panel" id="step-panel-4">
+        <div class="eyebrow">STEP 4 OF 9 • FINANCIAL STRUCTURE</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">How is money earned?</h2>
+
+        <div class="warning" style="margin-bottom: 20px;">
+          <b>⚠ Strict Rule</b>
+          <p>Do NOT claim "Guaranteed ₹X". Always specify realistic ranges or performance-dependent models.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Earning Model</label>
+            <select id="m-earning-model" class="select" required>
+              <option value="FREELANCE">Freelance payment / Client contract</option>
+              <option value="COMMISSION">Commission based</option>
+              <option value="PER_TASK">Per task / Per unit compensation</option>
+              <option value="TOURNAMENT">Tournament prize / Competition</option>
+              <option value="AFFILIATE">Affiliate attribution</option>
+              <option value="RESELLING">Reselling margin</option>
+              <option value="FIXED">Fixed documented reward</option>
+              <option value="OTHER">Other variable model</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Starting Cost</label>
+            <input type="text" id="m-start-cost" class="input" value="₹0 / Free">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Potential / Typical Earning Range</label>
+            <input type="text" id="m-potential-earning" class="input" placeholder="e.g. ₹5,000 – ₹25,000 / month" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Frequency &amp; Method</label>
+            <input type="text" id="m-payment-method" class="input" placeholder="e.g. Bi-weekly via Bank Transfer / UPI / Wise">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Proof & Redaction -->
+      <div class="wizard-step-panel" id="step-panel-5">
+        <div class="eyebrow">STEP 5 OF 9 • EVIDENCE &amp; PROOF</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Attach supporting evidence</h2>
+
+        <div class="redaction-warning">
+          <div style="font-size: 20px;">🛡</div>
+          <div>
+            <b>Sensitive Data Protection Alert:</b>
+            <p>
+              Never upload OTPs, passwords, bank account passwords, debit/credit card numbers, CVV, Aadhaar, PAN or confidential personal IDs.
+              Please black out/redact any sensitive private numbers before uploading screenshots.
+            </p>
+          </div>
+        </div>
+
+        <div class="file-dropzone" id="proof-dropzone">
+          <i>📁</i>
+          <b style="font-size: 14px;">Click or drag screenshots, payout receipts, or dashboard proof</b>
+          <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Supports JPG, PNG, WEBP, PDF (Max 15MB each)</p>
+          <input type="file" id="proof-file-input" multiple accept="image/*,application/pdf" style="display: none;">
+        </div>
+
+        <div class="uploaded-files-list" id="uploaded-files-container"></div>
+      </div>
+
+      <!-- STEP 6: Video Tutorial -->
+      <div class="wizard-step-panel" id="step-panel-6">
+        <div class="eyebrow">STEP 6 OF 9 • VIDEO EXPLANATION</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">Video walkthrough or tutorial</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
+          Attach a YouTube, Loom, or Drive video URL demonstrating the workflow and mistakes to avoid.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Video URL <small>(Optional)</small></label>
+          <input type="url" id="m-video-url" class="input" placeholder="https://www.youtube.com/watch?v=... or Loom URL">
+        </div>
+      </div>
+
+      <!-- STEP 7: Safety & Scam Prevention -->
+      <div class="wizard-step-panel" id="step-panel-7">
+        <div class="eyebrow">STEP 7 OF 9 • SAFETY &amp; SCAM PREVENTION</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">Disclose risks &amp; scam scenarios</h2>
+
+        <div class="form-group">
+          <label class="form-label">Known Practical &amp; Financial Risks</label>
+          <textarea id="m-risks" class="textarea" placeholder="What could go wrong? What if the client delays or policy changes?" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Common Scam Scenarios to Avoid</label>
+          <textarea id="m-scams" class="textarea" placeholder="Are there fake impersonators or unofficial deposit requests users should watch out for?" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">What should users NEVER do in this method?</label>
+          <input type="text" id="m-never-do" class="input" value="Never pay security deposits to personal UPI/accounts.">
+        </div>
+      </div>
+
+      <!-- STEP 8: Sources & Official Links -->
+      <div class="wizard-step-panel" id="step-panel-8">
+        <div class="eyebrow">STEP 8 OF 9 • SOURCES &amp; DOCUMENTATION</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">Where did this information originate?</h2>
+
+        <div class="form-group">
+          <label class="form-label">Official Website / Platform URL</label>
+          <input type="url" id="m-official-url" class="input" placeholder="https://..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Terms of Service / Guidelines URL</label>
+          <input type="url" id="m-terms-url" class="input" placeholder="https://.../terms">
+        </div>
+      </div>
+
+      <!-- STEP 9: Real Personal Experience -->
+      <div class="wizard-step-panel" id="step-panel-9">
+        <div class="eyebrow">STEP 9 OF 9 • PERSONAL EXPERIENCE CLAIM</div>
+        <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 20px;">Have you personally used this method?</h2>
+
+        <div class="form-group">
+          <label class="form-label">Personal Usage</label>
+          <select id="m-personally-used" class="select">
+            <option value="Yes">Yes, I have personally earned using this method</option>
+            <option value="Partially">Partially tested / In progress</option>
+            <option value="No">No, this is researched from official documentation</option>
+          </select>
+        </div>
+
+        <div id="personal-claim-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div class="form-group">
+            <label class="form-label">Total Amount Personally Earned (₹)</label>
+            <input type="number" id="m-amount-earned" class="input" placeholder="e.g. 15000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time Period &amp; Hours Spent</label>
+            <input type="text" id="m-period-hours" class="input" placeholder="e.g. May – June 2026 (~20 hrs)">
+          </div>
+        </div>
+
+        <div class="disclaimer" style="margin-top: 24px;">
+          <b>⚠</b>
+          <p>
+            By submitting, you certify that all details, evidence, and claims are honest to your best knowledge.
+            Submissions with fraudulent claims or fake screenshots will result in immediate account termination.
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
+      <div class="wizard-nav-footer">
+        <button type="button" id="prev-step-btn" class="btn secondary" disabled>← Previous</button>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="save-draft-btn" class="btn secondary">Save Draft</button>
+          <button type="button" id="next-step-btn" class="btn primary">Next Step →</button>
+          <button type="submit" id="submit-method-btn" class="btn primary" style="display: none;">Submit for Review <b>↗</b></button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml } from '/js/ui.js';
+
+    await initNavbar('/share-method');
+
+    // Authentication Guard
+    const session = await API.getSession();
+    if (!session.authenticated) {
+      showToast('Please log in to share an earning method.', 'info');
+      setTimeout(() => window.location.href = '/login', 800);
+    }
+
+    let currentStep = 1;
+    const totalSteps = 9;
+    let uploadedProofFiles = [];
+
+    // Step navigation nodes
+    const stepNodes = Array.from(document.querySelectorAll('.wizard-step-node'));
+    const stepPanels = Array.from(document.querySelectorAll('.wizard-step-panel'));
+
+    function goToStep(step) {
+      if (step < 1 || step > totalSteps) return;
+      currentStep = step;
+
+      stepPanels.forEach((p, i) => p.classList.toggle('active', i + 1 === currentStep));
+      stepNodes.forEach((n, i) => {
+        n.classList.toggle('active', i + 1 === currentStep);
+        n.classList.toggle('completed', i + 1 < currentStep);
+      });
+
+      document.getElementById('prev-step-btn').disabled = currentStep === 1;
+
+      if (currentStep === totalSteps) {
+        document.getElementById('next-step-btn').style.display = 'none';
+        document.getElementById('submit-method-btn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('next-step-btn').style.display = 'inline-flex';
+        document.getElementById('submit-method-btn').style.display = 'none';
+      }
+
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
+
+    document.getElementById('prev-step-btn').addEventListener('click', () => goToStep(currentStep - 1));
+    document.getElementById('next-step-btn').addEventListener('click', () => goToStep(currentStep + 1));
+
+    stepNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        const targetStep = parseInt(node.getAttribute('data-step'), 10);
+        goToStep(targetStep);
+      });
+    });
+
+    // Step Builder in Step 2
+    let stepCount = 1;
+    const addStepBtn = document.getElementById('add-step-btn');
+    const stepsContainer = document.getElementById('steps-builder-container');
+
+    addStepBtn.addEventListener('click', () => {
+      stepCount++;
+      const div = document.createElement('div');
+      div.className = 'step-row-item';
+      div.innerHTML = `
+        <div class="step-header">
+          <b style="font-size: 13px; color: var(--cyan);">Step ${stepCount}</b>
+          <button type="button" class="btn danger sm remove-step-btn" style="padding: 2px 8px; font-size: 10px;">Remove</button>
+        </div>
+        <input type="text" class="input step-title-input" placeholder="Step title" style="margin-bottom: 8px;">
+        <textarea class="textarea step-desc-input" placeholder="Explain the specific actions for this step..." style="min-height: 60px;"></textarea>
+      `;
+      stepsContainer.appendChild(div);
+
+      div.querySelector('.remove-step-btn').addEventListener('click', () => {
+        div.remove();
+      });
+    });
+
+    // File Upload Handler in Step 5
+    const dropzone = document.getElementById('proof-dropzone');
+    const fileInput = document.getElementById('proof-file-input');
+    const uploadedContainer = document.getElementById('uploaded-files-container');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+
+      const formData = new FormData();
+      files.forEach(f => formData.append('files', f));
+
+      showToast('Uploading proof files...', 'info');
+
+      try {
+        const res = await API.uploadProofFiles(formData);
+        if (res.success && res.files) {
+          uploadedProofFiles.push(...res.files);
+          renderUploadedFiles();
+          showToast('Proof files attached successfully!', 'success');
+        } else {
+          showToast(res.error || 'Upload failed.', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    function renderUploadedFiles() {
+      uploadedContainer.innerHTML = uploadedProofFiles.map((f, i) => `
+        <div class="uploaded-file-card">
+          <img src="${f.url}" alt="proof">
+          <button type="button" class="remove-btn" onclick="window.removeProofFile(${i})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    window.removeProofFile = function(index) {
+      uploadedProofFiles.splice(index, 1);
+      renderUploadedFiles();
+    };
+
+    // Gather Form Data
+    function assembleFormData() {
+      const steps = Array.from(document.querySelectorAll('.step-row-item')).map((item, idx) => ({
+        stepNumber: idx + 1,
+        title: item.querySelector('.step-title-input')?.value.trim() || `Step ${idx + 1}`,
+        description: item.querySelector('.step-desc-input')?.value.trim() || ''
+      }));
+
+      return {
+        basicInfo: {
+          title: document.getElementById('m-title').value.trim(),
+          categoryId: document.getElementById('m-category').value,
+          categorySlug: document.getElementById('m-category').value,
+          categoryName: document.getElementById('m-category').selectedOptions[0]?.text?.split(' ')[0] || 'General',
+          shortDescription: document.getElementById('m-description').value.trim()
+        },
+        howItWorks: {
+          explanation: document.getElementById('m-how-overview').value.trim(),
+          steps
+        },
+        requirements: {
+          requiredSkills: document.getElementById('m-skills').value.trim(),
+          requiredPlatforms: document.getElementById('m-platform-acc').value.trim(),
+          countryAvailability: document.getElementById('m-country').value.trim(),
+          deviceRequirements: document.getElementById('m-device').value.trim(),
+          timeRequired: document.getElementById('m-time').value.trim()
+        },
+        moneyDetails: {
+          earningModel: document.getElementById('m-earning-model').value,
+          startingCost: document.getElementById('m-start-cost').value.trim(),
+          potentialEarning: document.getElementById('m-potential-earning').value.trim(),
+          paymentMethod: document.getElementById('m-payment-method').value.trim()
+        },
+        proof: {
+          files: uploadedProofFiles
+        },
+        video: {
+          videoUrl: document.getElementById('m-video-url').value.trim()
+        },
+        safety: {
+          knownRisks: document.getElementById('m-risks').value.trim(),
+          possibleScams: document.getElementById('m-scams').value.trim(),
+          whatNeverToDo: document.getElementById('m-never-do').value.trim()
+        },
+        sources: {
+          officialWebsite: document.getElementById('m-official-url').value.trim(),
+          termsUrl: document.getElementById('m-terms-url').value.trim()
+        },
+        experience: {
+          personallyUsed: document.getElementById('m-personally-used').value,
+          amountEarned: document.getElementById('m-amount-earned').value.trim(),
+          timePeriod: document.getElementById('m-period-hours').value.trim()
+        }
+      };
+    }
+
+    // Save Draft
+    document.getElementById('save-draft-btn').addEventListener('click', async () => {
+      const payload = assembleFormData();
+      try {
+        const res = await API.submitMethod(payload, true);
+        if (res.success) {
+          showToast('Draft saved successfully!', 'success');
+        } else {
+          showToast(res.error || 'Failed to save draft.', 'error');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Final Submit
+    document.getElementById('share-method-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = assembleFormData();
+
+      const submitBtn = document.getElementById('submit-method-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Submitting for admin audit...';
+
+      try {
+        const res = await API.submitMethod(payload, false);
+        if (res.success) {
+          showToast('Method submitted for review! You can track its status in My Submissions.', 'success');
+          setTimeout(() => {
+            window.location.href = '/my-submissions';
+          }, 1000);
+        } else {
+          showToast(res.error || 'Submission failed.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Submit for Review <b>↗</b>';
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit for Review <b>↗</b>';
+      }
+    });
+  </script>
+</body>
+</html>

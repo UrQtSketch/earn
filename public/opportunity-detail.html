@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opportunity Dossier — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding-bottom: 80px;" id="dossier-root">
+    <div style="padding: 60px 0; text-align: center; color: var(--muted);">Loading complete opportunity dossier...</div>
+  </main>
+
+  <!-- Collaboration Request Modal -->
+  <div class="modal-overlay" id="collab-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-collab-modal">✕</button>
+      <div class="eyebrow"><i></i> TEAM UP</div>
+      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Request Collaboration</h2>
+      <p style="font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px;">
+        Connect with the creator or participants on this opportunity to collaborate and share techniques.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea id="collab-message" class="textarea" placeholder="Explain your skills and how you'd like to collaborate..."></textarea>
+      </div>
+
+      <div class="warning" style="margin-bottom: 20px;">
+        <b>⚠ Safety Reminder</b>
+        <p>EarnRadar does not hold or guarantee payments between users. Never send money or share bank passwords.</p>
+      </div>
+
+      <button id="send-collab-btn" class="btn primary" style="width: 100%;">Send Collaboration Request <b>↗</b></button>
+    </div>
+  </div>
+
+  <!-- Report Opportunity Modal -->
+  <div class="modal-overlay" id="report-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="close-report-modal">✕</button>
+      <div class="eyebrow"><i></i> MODERATION DISCLOSURE</div>
+      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Report Opportunity</h2>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
+        Help keep the community safe. All reports are audited by moderators.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Reason</label>
+        <select id="report-reason" class="select">
+          <option value="SCAM">Suspected Scam / Phishing</option>
+          <option value="FAKE_PROOF">Fake / Altered Proof Screenshots</option>
+          <option value="MISLEADING_EARNINGS">Misleading Earnings Claim</option>
+          <option value="BROKEN_METHOD">Broken / Expired Method</option>
+          <option value="PAYMENT_ISSUE">Payment / Withdrawal Refusal</option>
+          <option value="SPAM">Spam / Unsolicited Affiliate</option>
+          <option value="OTHER">Other Violation</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Additional Details</label>
+        <textarea id="report-details" class="textarea" placeholder="Describe the issue with links or evidence..."></textarea>
+      </div>
+
+      <button id="submit-report-btn" class="btn danger" style="width: 100%;">Submit Report for Moderation</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/opportunities');
+
+    // Extract slug from URL path e.g. /opportunities/:slug
+    const pathParts = window.location.pathname.split('/');
+    const slug = pathParts[pathParts.length - 1] || 'community-gaming-tournament-rewards';
+
+    let currentOpp = null;
+    let currentUser = null;
+
+    async function loadOpportunityDossier() {
+      try {
+        const session = await API.getSession();
+        if (session.authenticated) {
+          currentUser = session.user;
+        }
+
+        const res = await API.getOpportunity(slug);
+        if (!res.success || !res.opportunity) {
+          document.getElementById('dossier-root').innerHTML = `
+            <div style="padding: 80px 0; text-align: center;">
+              <h2 style="font: 700 28px var(--font-heading); margin-bottom: 12px;">Opportunity Not Found</h2>
+              <p style="color: var(--muted); margin-bottom: 24px;">This opportunity may have been removed or under review.</p>
+              <a class="btn primary" href="/opportunities">Back to Directory</a>
+            </div>
+          `;
+          return;
+        }
+
+        currentOpp = res.opportunity;
+        renderDossier(currentOpp);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderDossier(opp) {
+      const isJoined = Boolean(opp.userMembership);
+      const isSaved = Boolean(opp.isSaved);
+
+      document.getElementById('dossier-root').innerHTML = `
+        <div class="dossier-header">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div class="tags">
+              <span class="verified">${opp.status}</span>
+              <span>${escapeHtml(opp.category?.name || 'General')}</span>
+              <em>Last checked: ${formatTimeAgo(opp.lastVerifiedDate)}</em>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button id="save-btn" class="btn secondary sm">${isSaved ? '★ Saved in Watchlist' : '☆ Save Opportunity'}</button>
+              <button id="report-btn" class="btn secondary sm" style="color: var(--red);">⚠ Report</button>
+            </div>
+          </div>
+
+          <h1>${escapeHtml(opp.title)}</h1>
+          <p style="color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 850px;">
+            ${escapeHtml(opp.description)}
+          </p>
+
+          <div style="display: flex; gap: 24px; margin-top: 20px; font-size: 12px; color: var(--muted); flex-wrap: wrap;">
+            <span>👤 Author: <b>${escapeHtml(opp.author?.profile?.fullName || 'Verified Community Member')}</b> (@${escapeHtml(opp.author?.profile?.username || 'member')})</span>
+            <span>👥 <b>${opp.joinsCount}</b> participating</span>
+            <span>👁 <b>${opp.viewsCount}</b> views</span>
+          </div>
+        </div>
+
+        <div class="dossier-grid">
+          <!-- Main Left Column -->
+          <div>
+            <!-- Section: How It Works & Step-by-Step Breakdown -->
+            <div class="card" style="margin-bottom: 24px;">
+              <div class="eyebrow"><i></i> STEP-BY-STEP PROCESS</div>
+              <h2 style="font: 700 22px var(--font-heading); margin-bottom: 12px;">How this opportunity works</h2>
+              <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px;">
+                ${escapeHtml(opp.howItWorks)}
+              </p>
+
+              <div class="step-timeline">
+                ${(opp.steps || []).map((step, idx) => `
+                  <div class="step-timeline-item">
+                    <div class="step-badge">${step.stepNumber || idx + 1}</div>
+                    <div class="step-content">
+                      <h4>${escapeHtml(step.title)}</h4>
+                      <p>${escapeHtml(step.description)}</p>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Section: Requirements & Earning Model -->
+            <div class="card" style="margin-bottom: 24px;">
+              <div class="eyebrow"><i></i> PREREQUISITES &amp; ELIGIBILITY</div>
+              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">What you need to start</h3>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="trust-row"><span>Who can do it</span><b>${escapeHtml(opp.whoCanDoIt || 'Anyone eligible')}</b></div>
+                <div class="trust-row"><span>Required skills</span><b>${escapeHtml(opp.skillsRequired || 'Basic')}</b></div>
+                <div class="trust-row"><span>Time commitment</span><b>${escapeHtml(opp.timeRequired || 'Flexible')}</b></div>
+                <div class="trust-row"><span>Starting cost</span><b style="color: var(--cyan);">${escapeHtml(opp.startingCost || '₹0 / Free')}</b></div>
+                <div class="trust-row"><span>Earning Model</span><b>${escapeHtml(opp.earningModel || 'Variable')}</b></div>
+                <div class="trust-row"><span>Location</span><b>${escapeHtml(opp.location || 'Online')}</b></div>
+              </div>
+            </div>
+
+            <!-- Section: Risks, Common Scams & Safety Checklist -->
+            <div class="card" style="margin-bottom: 24px; border-color: rgba(255, 216, 107, 0.25);">
+              <div class="eyebrow" style="color: var(--yellow);"><i></i> HONESTY &amp; RISK DISCLOSURE</div>
+              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 12px; color: var(--yellow);">Known Risks &amp; Scams to Avoid</h3>
+
+              <div style="margin-bottom: 18px;">
+                <strong style="font-size: 13px; color: #fff;">Known Practical Risks:</strong>
+                <p style="font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.6;">${escapeHtml(opp.risks || 'Earnings fluctuate based on performance.')}</p>
+              </div>
+
+              <div style="margin-bottom: 18px;">
+                <strong style="font-size: 13px; color: var(--red);">Common Scam Warnings:</strong>
+                <p style="font-size: 12px; color: #ffb4c2; margin-top: 4px; line-height: 1.6;">${escapeHtml(opp.commonScams || 'Never pay advance registration money to unknown Telegram accounts.')}</p>
+              </div>
+
+              <div>
+                <strong style="font-size: 13px; color: var(--green);">Safety Checklist:</strong>
+                <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                  ${(opp.safetyChecklist || []).map(item => `
+                    <div style="display: flex; gap: 8px; font-size: 12px; color: var(--muted); align-items: center;">
+                      <span style="color: var(--green);">✓</span>
+                      <span>${escapeHtml(item)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Section: Evidence & Proof Gallery -->
+            ${opp.evidence && opp.evidence.length > 0 ? `
+              <div class="card" style="margin-bottom: 24px;">
+                <div class="eyebrow"><i></i> ATTACHED PROOF</div>
+                <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Evidence &amp; Verification Documents</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+                  ${opp.evidence.map(ev => `
+                    <div style="border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel2);">
+                      <img src="${escapeHtml(ev.fileUrl)}" style="width: 100%; height: 140px; object-fit: cover;" alt="Evidence screenshot">
+                      <div style="padding: 10px; font-size: 11px;">
+                        <span class="tags"><span class="verified">${ev.verifiedStatus}</span></span>
+                        <p style="color: var(--muted); margin-top: 6px;">${escapeHtml(ev.caption || 'Submitted proof')}</p>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Section: Community Discussion & Comments -->
+            <div class="discussion-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 style="font: 700 22px var(--font-heading);">Community Discussion</h3>
+                <span style="font-size: 12px; color: var(--muted);">${opp.comments?.length || 0} questions &amp; tips</span>
+              </div>
+
+              <!-- Comment Input -->
+              <div class="card" style="padding: 18px; margin-bottom: 24px;">
+                <textarea id="comment-input" class="textarea" placeholder="Ask a question or share your experience with this opportunity..." style="min-height: 80px;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                  <span style="font-size: 10px; color: var(--muted);">No spam or external link shorteners.</span>
+                  <button id="post-comment-btn" class="btn primary sm">Post Comment <b>→</b></button>
+                </div>
+              </div>
+
+              <!-- Comments List -->
+              <div id="comments-container">
+                ${(opp.comments || []).length > 0 ? (opp.comments.map(c => `
+                  <div class="comment-item">
+                    <div class="comment-author">
+                      <div class="avatar" style="width: 26px; height: 26px; font-size: 10px;">${(c.author?.profile?.fullName || 'U').charAt(0).toUpperCase()}</div>
+                      <span style="font-size: 12px; font-weight: 700;">${escapeHtml(c.author?.profile?.fullName || 'Community Member')}</span>
+                      <span style="font-size: 10px; color: var(--muted);">@${escapeHtml(c.author?.profile?.username || 'user')}</span>
+                      <span style="font-size: 10px; color: var(--dim); margin-left: auto;">${formatTimeAgo(c.createdAt)}</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text); line-height: 1.6;">${escapeHtml(c.content)}</p>
+                  </div>
+                `).join('')) : '<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 12px;">No comments yet. Be the first to start the discussion!</div>'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky Action Sidebar -->
+          <div class="action-sidebar">
+            <div class="action-card">
+              <small class="eyebrow" style="color: var(--green);">REPORTED RANGE</small>
+              <strong style="font: 700 28px var(--font-heading); color: var(--green); display: block; margin: 8px 0 4px;">
+                ${escapeHtml(opp.potentialEarning || 'Variable')}
+              </strong>
+              <span style="font-size: 10px; color: var(--muted);">Subject to performance, skills &amp; terms.</span>
+
+              <div style="margin: 20px 0; border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                ${isJoined ? `
+                  <div style="padding: 12px; border-radius: 10px; background: rgba(125,255,178,0.1); border: 1px solid rgba(125,255,178,0.3); text-align: center;">
+                    <b style="color: var(--green); font-size: 12px;">✓ You joined this opportunity</b>
+                    <p style="font-size: 10px; color: var(--muted); margin-top: 4px;">Track your progress in <a href="/my-opportunities" style="color: var(--cyan); text-decoration: underline;">Joined Opportunities</a>.</p>
+                  </div>
+                  <button id="leave-btn" class="btn secondary sm" style="width: 100%;">Leave Opportunity</button>
+                ` : `
+                  <button id="join-btn" class="btn primary" style="width: 100%;">
+                    Join Opportunity <b>↗</b>
+                  </button>
+                `}
+
+                <button id="open-collab-btn" class="btn cyan" style="width: 100%;">
+                  🤝 Request Collaboration
+                </button>
+              </div>
+
+              ${opp.officialSource ? `
+                <div style="font-size: 11px; margin-top: 12px;">
+                  <span style="color: var(--muted);">Official Platform:</span><br>
+                  <a href="${escapeHtml(opp.officialSource)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan); text-decoration: underline; word-break: break-all;">
+                    ${escapeHtml(opp.platformWebsite || opp.officialSource)} ↗
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Author Card -->
+            <div class="card" style="padding: 20px;">
+              <small class="eyebrow">SUBMITTED BY</small>
+              <div style="display: flex; gap: 12px; align-items: center; margin: 12px 0;">
+                <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">${(opp.author?.profile?.fullName || 'M').charAt(0).toUpperCase()}</div>
+                <div>
+                  <b style="font-size: 14px;">${escapeHtml(opp.author?.profile?.fullName || 'Community Member')}</b>
+                  <div style="font-size: 11px; color: var(--cyan);">@${escapeHtml(opp.author?.profile?.username || 'member')}</div>
+                </div>
+              </div>
+              <p style="font-size: 11px; color: var(--muted); line-height: 1.5;">
+                ${escapeHtml(opp.author?.profile?.bio || 'Active EarnRadar community contributor.')}
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      attachEventListeners();
+    }
+
+    function attachEventListeners() {
+      // Save Button
+      const saveBtn = document.getElementById('save-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          if (!currentUser) {
+            showToast('Please log in to save opportunities.', 'info');
+            return;
+          }
+          try {
+            const res = await API.saveOpportunity(currentOpp.id);
+            if (res.success) {
+              showToast(res.message, 'success');
+              saveBtn.textContent = res.saved ? '★ Saved in Watchlist' : '☆ Save Opportunity';
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          }
+        });
+      }
+
+      // Join Button
+      const joinBtn = document.getElementById('join-btn');
+      if (joinBtn) {
+        joinBtn.addEventListener('click', async () => {
+          if (!currentUser) {
+            showToast('Please sign in or register to join opportunities.', 'info');
+            setTimeout(() => window.location.href = '/login', 1000);
+            return;
+          }
+          joinBtn.disabled = true;
+          try {
+            const res = await API.joinOpportunity(currentOpp.id);
+            if (res.success) {
+              showToast(res.message, 'success');
+              loadOpportunityDossier();
+            } else {
+              showToast(res.error || 'Failed to join.', 'error');
+              joinBtn.disabled = false;
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+            joinBtn.disabled = false;
+          }
+        });
+      }
+
+      // Leave Button
+      const leaveBtn = document.getElementById('leave-btn');
+      if (leaveBtn) {
+        leaveBtn.addEventListener('click', async () => {
+          try {
+            const res = await API.leaveOpportunity(currentOpp.id);
+            if (res.success) {
+              showToast(res.message, 'info');
+              loadOpportunityDossier();
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          }
+        });
+      }
+
+      // Post Comment
+      const commentBtn = document.getElementById('post-comment-btn');
+      if (commentBtn) {
+        commentBtn.addEventListener('click', async () => {
+          if (!currentUser) {
+            showToast('Please log in to post comments.', 'info');
+            return;
+          }
+          const commentInput = document.getElementById('comment-input');
+          const content = commentInput.value.trim();
+          if (!content) {
+            showToast('Comment cannot be empty.', 'error');
+            return;
+          }
+
+          commentBtn.disabled = true;
+          try {
+            const res = await API.postComment(currentOpp.id, content);
+            if (res.success) {
+              showToast('Comment posted.', 'success');
+              commentInput.value = '';
+              loadOpportunityDossier();
+            } else {
+              showToast(res.error || 'Failed to post comment.', 'error');
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          } finally {
+            commentBtn.disabled = false;
+          }
+        });
+      }
+
+      // Collaboration Modal
+      const openCollabBtn = document.getElementById('open-collab-btn');
+      const collabModal = document.getElementById('collab-modal');
+      const closeCollabModal = document.getElementById('close-collab-modal');
+      const sendCollabBtn = document.getElementById('send-collab-btn');
+
+      if (openCollabBtn && collabModal) {
+        openCollabBtn.addEventListener('click', () => {
+          if (!currentUser) {
+            showToast('Please log in to request collaborations.', 'info');
+            return;
+          }
+          collabModal.classList.add('show');
+        });
+        closeCollabModal.addEventListener('click', () => collabModal.classList.remove('show'));
+
+        sendCollabBtn.addEventListener('click', async () => {
+          const msg = document.getElementById('collab-message').value.trim();
+          const targetReceiverId = currentOpp.authorId || currentOpp.author?.id;
+
+          if (!targetReceiverId) {
+            showToast('Cannot collaborate on this opportunity right now.', 'error');
+            return;
+          }
+
+          sendCollabBtn.disabled = true;
+          try {
+            const res = await API.sendCollaborationRequest(targetReceiverId, currentOpp.id, msg);
+            if (res.success) {
+              showToast(res.message, 'success');
+              collabModal.classList.remove('show');
+            } else {
+              showToast(res.error || 'Failed to send request.', 'error');
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          } finally {
+            sendCollabBtn.disabled = false;
+          }
+        });
+      }
+
+      // Report Modal
+      const reportBtn = document.getElementById('report-btn');
+      const reportModal = document.getElementById('report-modal');
+      const closeReportModal = document.getElementById('close-report-modal');
+      const submitReportBtn = document.getElementById('submit-report-btn');
+
+      if (reportBtn && reportModal) {
+        reportBtn.addEventListener('click', () => {
+          if (!currentUser) {
+            showToast('Please log in to submit a report.', 'info');
+            return;
+          }
+          reportModal.classList.add('show');
+        });
+        closeReportModal.addEventListener('click', () => reportModal.classList.remove('show'));
+
+        submitReportBtn.addEventListener('click', async () => {
+          const reason = document.getElementById('report-reason').value;
+          const details = document.getElementById('report-details').value.trim();
+
+          submitReportBtn.disabled = true;
+          try {
+            const res = await API.submitReport('OPPORTUNITY', currentOpp.id, reason, details);
+            if (res.success) {
+              showToast(res.message, 'success');
+              reportModal.classList.remove('show');
+            } else {
+              showToast(res.error || 'Failed to file report.', 'error');
+            }
+          } catch (err) {
+            showToast(err.message, 'error');
+          } finally {
+            submitReportBtn.disabled = false;
+          }
+        });
+      }
+    }
+
+    loadOpportunityDossier();
+  </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Moderation — EarnRadar Admin</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow"><i></i> METHOD MODERATION QUEUE</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">Submitted Earning Methods</h1>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link active">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link">📜 Audit Log</a>
+    </div>
+
+    <!-- Submissions Table -->
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="submissions-tbody">
+          <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">Loading submissions...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Submission Review Inspection Modal -->
+  <div class="modal-overlay" id="review-modal">
+    <div class="modal-content" style="max-width: 850px;">
+      <button class="modal-close" id="close-review-modal">✕</button>
+      <div class="eyebrow"><i></i> SUBMISSION INSPECTOR</div>
+      <h2 id="modal-sub-title" style="font: 700 24px var(--font-heading); margin: 8px 0;">Method Title</h2>
+      <div id="modal-sub-meta" style="font-size: 11px; color: var(--muted); margin-bottom: 20px;"></div>
+
+      <div id="modal-sub-body" style="display: flex; flex-direction: column; gap: 16px; max-height: 60vh; overflow-y: auto; padding-right: 8px;">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div style="border-top: 1px solid var(--line); padding-top: 20px; margin-top: 20px;">
+        <label class="form-label">Moderator Feedback / Notes</label>
+        <textarea id="modal-feedback" class="textarea" placeholder="Specify instructions if requesting changes or noting reasons..."></textarea>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+          <button id="btn-sub-reject" class="btn danger sm">Reject</button>
+          <button id="btn-sub-changes" class="btn secondary sm" style="color: var(--yellow);">Request Changes</button>
+          <button id="btn-sub-approve" class="btn primary sm">Approve &amp; Publish to Live Radar <b>✓</b></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/admin/submissions');
+
+    let allSubmissions = [];
+    let selectedSub = null;
+
+    async function loadSubmissions() {
+      const tbody = document.getElementById('submissions-tbody');
+      try {
+        const res = await API.getAdminSubmissions();
+        if (res.success && res.submissions.length > 0) {
+          allSubmissions = res.submissions;
+          tbody.innerHTML = res.submissions.map(sub => `
+            <tr>
+              <td>
+                <b style="font-size: 13px;">${escapeHtml(sub.title)}</b>
+                <div style="font-size: 10px; color: var(--muted);">${escapeHtml(sub.formData?.basicInfo?.shortDescription?.slice(0, 70) || '')}...</div>
+              </td>
+              <td>
+                <div>${escapeHtml(sub.author?.profile?.fullName || 'User')}</div>
+                <small style="color: var(--cyan);">@${escapeHtml(sub.author?.profile?.username || 'user')}</small>
+              </td>
+              <td>${escapeHtml(sub.formData?.basicInfo?.categoryName || 'General')}</td>
+              <td>${formatTimeAgo(sub.submittedAt || sub.createdAt)}</td>
+              <td><span class="status-pill ${sub.status.toLowerCase()}">${sub.status}</span></td>
+              <td style="text-align: right;">
+                <button class="btn primary sm inspect-btn" data-id="${sub.id}">Inspect &amp; Moderate</button>
+              </td>
+            </tr>
+          `).join('');
+
+          document.querySelectorAll('.inspect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.getAttribute('data-id');
+              const sub = allSubmissions.find(s => s.id === id);
+              if (sub) openInspectModal(sub);
+            });
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">No submissions found.</td></tr>';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const reviewModal = document.getElementById('review-modal');
+    document.getElementById('close-review-modal').addEventListener('click', () => reviewModal.classList.remove('show'));
+
+    function openInspectModal(sub) {
+      selectedSub = sub;
+      const f = sub.formData || {};
+      const b = f.basicInfo || {};
+      const w = f.howItWorks || {};
+      const r = f.requirements || {};
+      const m = f.moneyDetails || {};
+      const s = f.safety || {};
+      const src = f.sources || {};
+      const exp = f.experience || {};
+
+      document.getElementById('modal-sub-title').textContent = sub.title;
+      document.getElementById('modal-sub-meta').innerHTML = `
+        Submitted by <b>${escapeHtml(sub.author?.profile?.fullName || 'User')}</b> (${escapeHtml(sub.author?.email)}) • Status: <span class="status-pill ${sub.status.toLowerCase()}">${sub.status}</span>
+      `;
+
+      document.getElementById('modal-sub-body').innerHTML = `
+        <div class="card" style="padding: 16px;">
+          <b style="font-size: 12px; color: var(--cyan);">1. DESCRIPTION:</b>
+          <p style="font-size: 13px; color: var(--text); margin-top: 4px;">${escapeHtml(b.shortDescription || 'N/A')}</p>
+        </div>
+
+        <div class="card" style="padding: 16px;">
+          <b style="font-size: 12px; color: var(--cyan);">2. HOW IT WORKS &amp; STEPS:</b>
+          <p style="font-size: 12px; color: var(--muted); margin: 4px 0 10px;">${escapeHtml(w.explanation || '')}</p>
+          ${(w.steps || []).map((st, i) => `
+            <div style="font-size: 12px; margin-bottom: 6px;">
+              <b>Step ${i + 1}: ${escapeHtml(st.title)}</b> — <span>${escapeHtml(st.description)}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="card" style="padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+          <div><span style="color: var(--muted);">Skills:</span> <b>${escapeHtml(r.requiredSkills || 'None')}</b></div>
+          <div><span style="color: var(--muted);">Time:</span> <b>${escapeHtml(r.timeRequired || 'Flexible')}</b></div>
+          <div><span style="color: var(--muted);">Earning Model:</span> <b>${escapeHtml(m.earningModel || 'Variable')}</b></div>
+          <div><span style="color: var(--muted);">Potential:</span> <b style="color: var(--green);">${escapeHtml(m.potentialEarning || 'Variable')}</b></div>
+          <div><span style="color: var(--muted);">Official Source:</span> <a href="${escapeHtml(src.officialWebsite)}" target="_blank" style="color: var(--cyan);">${escapeHtml(src.officialWebsite || 'N/A')}</a></div>
+          <div><span style="color: var(--muted);">Personal Earned:</span> <b style="color: var(--yellow);">₹${escapeHtml(exp.amountEarned || '0')}</b> (${escapeHtml(exp.personallyUsed || 'No')})</div>
+        </div>
+
+        <div class="card" style="padding: 16px; border-color: rgba(255,216,107,0.3);">
+          <b style="font-size: 12px; color: var(--yellow);">7. SAFETY &amp; RISKS:</b>
+          <p style="font-size: 12px; color: var(--muted); margin-top: 4px;"><b>Risks:</b> ${escapeHtml(s.knownRisks || 'N/A')}</p>
+          <p style="font-size: 12px; color: var(--red); margin-top: 4px;"><b>Scam Warnings:</b> ${escapeHtml(s.possibleScams || 'N/A')}</p>
+        </div>
+
+        ${f.proof?.files?.length > 0 ? `
+          <div class="card" style="padding: 16px;">
+            <b style="font-size: 12px; color: var(--green);">ATTACHED PROOF FILES (${f.proof.files.length}):</b>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+              ${f.proof.files.map(file => `
+                <a href="${file.url}" target="_blank">
+                  <img src="${file.url}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line);">
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+
+      document.getElementById('modal-feedback').value = sub.adminFeedback || '';
+      reviewModal.classList.add('show');
+    }
+
+    // Modal Actions
+    document.getElementById('btn-sub-approve').addEventListener('click', async () => {
+      if (!selectedSub) return;
+      const feedback = document.getElementById('modal-feedback').value.trim();
+      const res = await API.reviewAdminSubmission(selectedSub.id, 'APPROVE', feedback);
+      if (res.success) {
+        showToast('Submission approved and published to live radar!', 'success');
+        reviewModal.classList.remove('show');
+        loadSubmissions();
+      } else {
+        showToast(res.error || 'Failed to approve.', 'error');
+      }
+    });
+
+    document.getElementById('btn-sub-changes').addEventListener('click', async () => {
+      if (!selectedSub) return;
+      const feedback = document.getElementById('modal-feedback').value.trim();
+      if (!feedback) {
+        showToast('Please provide feedback explaining what changes are needed.', 'error');
+        return;
+      }
+      const res = await API.reviewAdminSubmission(selectedSub.id, 'REQUEST_CHANGES', feedback);
+      if (res.success) {
+        showToast('Changes requested from author.', 'info');
+        reviewModal.classList.remove('show');
+        loadSubmissions();
+      } else {
+        showToast(res.error || 'Failed to request changes.', 'error');
+      }
+    });
+
+    document.getElementById('btn-sub-reject').addEventListener('click', async () => {
+      if (!selectedSub) return;
+      const feedback = document.getElementById('modal-feedback').value.trim();
+      const res = await API.reviewAdminSubmission(selectedSub.id, 'REJECT', feedback);
+      if (res.success) {
+        showToast('Submission rejected.', 'info');
+        reviewModal.classList.remove('show');
+        loadSubmissions();
+      } else {
+        showToast(res.error || 'Failed to reject.', 'error');
+      }
+    });
+
+    loadSubmissions();
+  </script>
+</body>
+</html>

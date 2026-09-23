@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;" id="profile-root">
+    <div style="padding: 60px; text-align: center; color: var(--muted);">Loading profile...</div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatTimeAgo, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/profile');
+
+    const pathParts = window.location.pathname.split('/');
+    const targetUsername = pathParts[pathParts.length - 1] !== 'profile' ? pathParts[pathParts.length - 1] : null;
+
+    async function loadProfile() {
+      const root = document.getElementById('profile-root');
+
+      try {
+        let profile = null;
+        if (targetUsername) {
+          const res = await API.getPublicProfile(targetUsername);
+          if (res.success) profile = res.profile;
+        } else {
+          const session = await API.getSession();
+          if (!session.authenticated) {
+            window.location.href = '/login';
+            return;
+          }
+          const profRes = await API.getProfile();
+          if (profRes.success) profile = profRes.user.profile;
+        }
+
+        if (!profile) {
+          root.innerHTML = '<div style="padding: 60px; text-align: center; color: var(--red);">Profile not found.</div>';
+          return;
+        }
+
+        root.innerHTML = `
+          <div class="card" style="padding: 36px; margin-bottom: 32px;">
+            <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+              <div class="avatar" style="width: 72px; height: 72px; font-size: 26px;">
+                ${(profile.fullName || 'U').charAt(0).toUpperCase()}
+              </div>
+
+              <div style="flex: 1;">
+                <div class="eyebrow"><i></i> VERIFIED EARNRADAR MEMBER</div>
+                <h1 style="font: 700 32px var(--font-heading); margin: 4px 0;">${escapeHtml(profile.fullName)}</h1>
+                <div style="font-size: 13px; color: var(--cyan); font-weight: 700;">@${escapeHtml(profile.username)} • 📍 ${escapeHtml(profile.country || 'India')}</div>
+              </div>
+
+              <div>
+                <a class="btn secondary sm" href="/settings">⚙ Edit Profile</a>
+              </div>
+            </div>
+
+            <p style="color: var(--muted); font-size: 14px; line-height: 1.6; margin: 24px 0 20px;">
+              ${escapeHtml(profile.bio || 'Exploring, verifying and collaborating on legitimate online earning opportunities.')}
+            </p>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+              ${(profile.skills || []).map(s => `<span class="status-pill submitted">${escapeHtml(s)}</span>`).join('')}
+            </div>
+
+            <div style="border-top: 1px solid var(--line); padding-top: 20px; display: flex; gap: 32px;">
+              <div>
+                <small class="eyebrow">TOTAL REPORTED EARNINGS</small>
+                <div style="font: 700 24px var(--font-heading); color: var(--green); margin-top: 4px;">
+                  ${formatCurrency(profile.totalReportedEarnings || 0)}
+                </div>
+                <span style="font-size: 9px; color: var(--dim);">COMMUNITY EVIDENCE REVIEWED</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

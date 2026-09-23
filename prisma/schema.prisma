@@ -1,0 +1,325 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  passwordHash     String
+  role             String          @default("USER") // USER, MODERATOR, ADMIN
+  status           String          @default("ACTIVE") // ACTIVE, SUSPENDED, BANNED
+  isEmailVerified  Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  profile          UserProfile?
+  authoredOpps     Opportunity[]   @relation("AuthorOpps")
+  submissions      MethodSubmission[]
+  memberships      OpportunityMembership[]
+  reportedEarnings ReportedEarning[]
+  sentCollabReqs   CollaborationRequest[] @relation("SentCollab")
+  recvCollabReqs   CollaborationRequest[] @relation("RecvCollab")
+  connections1     Connection[]    @relation("User1Conns")
+  connections2     Connection[]    @relation("User2Conns")
+  conversations1   Conversation[]  @relation("User1Conv")
+  conversations2   Conversation[]  @relation("User2Conv")
+  sentMessages     Message[]       @relation("SentMsgs")
+  recvMessages     Message[]       @relation("RecvMsgs")
+  comments         Comment[]
+  filedReports     Report[]        @relation("UserReports")
+  savedOpps        SavedOpportunity[]
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+}
+
+model UserProfile {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName              String
+  username              String   @unique
+  bio                   String?
+  country               String?  @default("India")
+  avatarUrl             String?
+  skills                String?  // JSON stringified array of skills
+  categories            String?  // JSON stringified array of category slugs
+  isPrivate             Boolean  @default(false)
+  totalReportedEarnings Float    @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model OTPVerification {
+  id                String   @id @default(uuid())
+  email             String
+  otpHash           String
+  purpose           String   // SIGNUP, LOGIN, RESET_PASSWORD
+  expiresAt         DateTime
+  attempts          Int      @default(0)
+  resendAvailableAt DateTime
+  isUsed            Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  @@index([email, purpose])
+}
+
+model Category {
+  id               String        @id @default(uuid())
+  slug             String        @unique
+  name             String
+  icon             String
+  description      String
+  opportunityCount Int           @default(0)
+  createdAt        DateTime      @default(now())
+  opportunities    Opportunity[]
+}
+
+model Opportunity {
+  id               String                  @id @default(uuid())
+  title            String
+  slug             String                  @unique
+  categoryId       String
+  category         Category                @relation(fields: [categoryId], references: [id])
+  authorId         String?
+  author           User?                   @relation("AuthorOpps", fields: [authorId], references: [id], onDelete: SetNull)
+  status           String                  @default("VERIFIED") // UNDER_REVIEW, VERIFIED, COMMUNITY_REPORTED, NEEDS_REVIEW, REJECTED, SUSPENDED
+  featured         Boolean                 @default(false)
+  description      String
+  howItWorks       String
+  whoCanDoIt       String?
+  skillsRequired   String?
+  timeRequired     String?
+  startingCost     String?
+  potentialEarning String?
+  earningModel     String?                 // FIXED, COMMISSION, PER_TASK, TOURNAMENT, FREELANCE, AFFILIATE, RESELLING, OTHER
+  location         String?                 @default("Online")
+  platformWebsite  String?
+  officialSource   String?
+  termsUrl         String?
+  risks            String?
+  commonScams      String?
+  safetyChecklist  String?                 // JSON stringified array
+  videoUrl         String?
+  lastVerifiedDate DateTime?               @default(now())
+  viewsCount       Int                     @default(0)
+  joinsCount       Int                     @default(0)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  steps            OpportunityStep[]
+  evidence         OpportunityEvidence[]
+  memberships      OpportunityMembership[]
+  comments         Comment[]
+  savedBy          SavedOpportunity[]
+  reportedEarnings ReportedEarning[]
+  collabRequests   CollaborationRequest[]
+
+  @@index([categoryId, status])
+}
+
+model OpportunityStep {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  stepNumber    Int
+  title         String
+  description   String
+
+  @@index([opportunityId, stepNumber])
+}
+
+model OpportunityEvidence {
+  id             String      @id @default(uuid())
+  opportunityId  String
+  opportunity    Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  type           String      // SCREENSHOT, TRANSACTION, DOCUMENT, VIDEO
+  fileUrl        String
+  caption        String?
+  verifiedStatus String      @default("USER_REPORTED") // UNVERIFIED, EVIDENCE_REVIEWED, VERIFIED_SOURCE, USER_REPORTED
+  createdAt      DateTime    @default(now())
+}
+
+model OpportunityMembership {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        String      @default("ACTIVE") // ACTIVE, COMPLETED, DROPPED
+  notes         String?
+  joinedAt      DateTime    @default(now())
+
+  @@unique([opportunityId, userId])
+}
+
+model MethodSubmission {
+  id            String    @id @default(uuid())
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title         String
+  categoryId    String
+  status        String    @default("SUBMITTED") // DRAFT, SUBMITTED, ADMIN_REVIEW, CHANGES_REQUESTED, APPROVED, REJECTED, PUBLISHED
+  formData      String    // Full 9-step JSON stringified form payload
+  adminFeedback String?
+  submittedAt   DateTime  @default(now())
+  reviewedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([authorId, status])
+}
+
+model ReportedEarning {
+  id            String       @id @default(uuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  submissionId  String?
+  amount        Float
+  currency      String       @default("INR")
+  period        String?      // e.g., "June - July 2026"
+  hoursSpent    Float?
+  attemptsCount Int?         @default(1)
+  evidenceUrl   String?
+  status        String       @default("USER_REPORTED") // UNVERIFIED, EVIDENCE_REVIEWED, VERIFIED_SOURCE, USER_REPORTED
+  adminNote     String?
+  createdAt     DateTime     @default(now())
+
+  @@index([userId, status])
+}
+
+model CollaborationRequest {
+  id            String      @id @default(uuid())
+  senderId      String
+  sender        User        @relation("SentCollab", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId    String
+  receiver      User        @relation("RecvCollab", fields: [receiverId], references: [id], onDelete: Cascade)
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  message       String
+  status        String      @default("PENDING") // PENDING, ACCEPTED, DECLINED, CANCELLED
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([receiverId, status])
+}
+
+model Connection {
+  id        String   @id @default(uuid())
+  user1Id   String
+  user1     User     @relation("User1Conns", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id   String
+  user2     User     @relation("User2Conns", fields: [user2Id], references: [id], onDelete: Cascade)
+  status    String   @default("ACTIVE") // ACTIVE, BLOCKED
+  createdAt DateTime @default(now())
+
+  @@unique([user1Id, user2Id])
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  user1Id   String
+  user1     User      @relation("User1Conv", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id   String
+  user2     User      @relation("User2Conv", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("SentMsgs", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId    String
+  recipient      User         @relation("RecvMsgs", fields: [recipientId], references: [id], onDelete: Cascade)
+  content        String
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model Comment {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId      String?
+  parent        Comment?    @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       Comment[]   @relation("CommentReplies")
+  content       String
+  isPinned      Boolean     @default(false)
+  isReported    Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([opportunityId, parentId])
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  reporterId  String
+  reporter    User     @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  targetType  String   // OPPORTUNITY, COMMENT, USER, SUBMISSION
+  targetId    String
+  reason      String   // SCAM, FAKE_PROOF, MISLEADING_EARNINGS, BROKEN_METHOD, PAYMENT_ISSUE, SPAM, HARASSMENT, OTHER
+  details     String?
+  status      String   @default("OPEN") // OPEN, UNDER_REVIEW, ACTION_TAKEN, DISMISSED
+  resolution  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, targetType])
+}
+
+model SavedOpportunity {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, opportunityId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action     String   // USER_SUSPENDED, SUBMISSION_APPROVED, CLAIM_VERIFIED, REPORT_DISMISSED, etc.
+  targetType String
+  targetId   String
+  details    String?  // JSON details
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, action, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // COLLABORATION_REQUEST, SUBMISSION_STATUS, NEW_COMMENT, SYSTEM
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
+}
+

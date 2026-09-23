@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EarnRadar — discover, verify and track online earning opportunities.">
+  <title>EarnRadar — Find. Verify. Decide.</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .hero{min-height:700px;padding:75px 0;display:grid;grid-template-columns:1.06fr .94fr;align-items:center;gap:75px}
+    .hero h1{font:700 clamp(50px,6.5vw,84px)/.96 var(--font-heading);letter-spacing:-4px}.hero h1 span{color:var(--cyan)}
+    .hero-copy>p{max-width:650px;margin:27px 0;color:var(--muted);font-size:15px;line-height:1.75}
+    .hero-actions{display:flex;gap:11px;margin-bottom:38px}
+    .mini-stats{display:flex;gap:34px}.mini-stats div{display:flex;flex-direction:column;gap:4px}.mini-stats strong{font:700 20px var(--font-heading)}.mini-stats span{font-size:10px;color:var(--muted)}
+    .section{padding:84px 0}
+    .section-head,.feed-head{display:flex;justify-content:space-between;gap:30px;align-items:end}
+    .section-head h2,.feed-head h2,.verify h2,.center-head h2,.submit-box h2{font:600 clamp(30px,4vw,48px)/1.05 var(--font-heading);letter-spacing:-1.8px;margin-top:9px}.section-head>p{color:var(--muted);font-size:12px}
+    .filters{display:flex;gap:6px;flex-wrap:wrap}.filters button{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);font:600 11px var(--font-body);cursor:pointer;transition:.2s}.filters .selected{color:var(--green);border-color:rgba(125,255,178,.25);background:rgba(125,255,178,.07)}
+    .verify{display:grid;grid-template-columns:1fr 410px;gap:100px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .verify h2 span{color:var(--cyan)}.verify>div>p{max-width:700px;color:var(--muted);font-size:13px;line-height:1.7;margin-top:17px}.checks{display:grid;gap:15px;margin-top:28px}.checks>div{display:flex;gap:12px}.checks b{width:23px;height:23px;display:grid;place-items:center;border-radius:50%;background:rgba(125,255,178,.09);color:var(--green);font-size:11px}.checks strong{font-size:12px}.checks small{display:block;margin-top:3px;color:var(--muted);font-size:10px;letter-spacing:0}
+    .center-head{text-align:center}.center-head p{margin-top:10px;color:var(--muted);font-size:12px}.steps{display:grid;grid-template-columns:1fr 45px 1fr 45px 1fr 45px 1fr;align-items:center;margin-top:47px}.step{text-align:center}.step>span{font:700 10px var(--font-heading);color:#4f5969}.step i{width:51px;height:51px;display:grid;place-items:center;margin:11px auto 13px;border:1px solid var(--line);border-radius:14px;background:rgba(103,232,255,.035);color:var(--cyan);font-style:normal;font-size:20px}.step h3{font:600 15px var(--font-heading)}.step p{max-width:185px;margin:6px auto;color:var(--muted);font-size:10px;line-height:1.55}.connector{height:1px;background:linear-gradient(90deg,transparent,rgba(103,232,255,.25),transparent)}
+    .submit-box{padding:43px;display:flex;align-items:center;justify-content:space-between;gap:25px;border:1px solid rgba(125,255,178,.16);border-radius:21px;background:radial-gradient(circle at 80% 50%,rgba(125,255,178,.07),transparent 30%),rgba(125,255,178,.018)}.submit-box p{max-width:720px;margin-top:10px;color:var(--muted);font-size:12px;line-height:1.6}
+    @media(max-width:1050px){.hero{grid-template-columns:1fr}.verify{grid-template-columns:1fr;gap:45px}.steps{grid-template-columns:1fr 1fr;gap:35px}.connector{display:none}}
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="ambient ambient-center"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar">
+    <!-- Injected dynamically by ui.js -->
+    <a class="logo" href="/">
+      <span class="logo-mark">↗</span>
+      <span>Earn<span>Radar</span></span>
+    </a>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="discover">
+      <div class="hero-copy">
+        <div class="eyebrow"><i></i> COMMUNITY EARNING RADAR • LIVE</div>
+        <h1>Find ways to earn.<br><span>Know the reality.</span></h1>
+        <p>
+          One place to discover online earning opportunities — gaming, freelancing,
+          creator programs, reselling, rewards and financial ideas — with the
+          requirements, effort, costs, risks and sources shown clearly.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="/opportunities">Explore opportunities <b>→</b></a>
+          <a class="btn secondary" href="/share-method">Share a method</a>
+        </div>
+
+        <div class="mini-stats">
+          <div><strong id="stat-listed">128</strong><span>listed</span></div>
+          <div><strong id="stat-checked">42</strong><span>source checked</span></div>
+          <div><strong id="stat-active">18</strong><span>active methods</span></div>
+        </div>
+      </div>
+
+      <div class="radar-shell">
+        <div class="radar-card">
+          <div class="card-top">
+            <div>
+              <small>OPPORTUNITY RADAR</small>
+              <h2>What people are watching</h2>
+            </div>
+            <span class="live"><i></i> LIVE</span>
+          </div>
+
+          <div class="radar">
+            <div class="radar-line horizontal"></div>
+            <div class="radar-line vertical"></div>
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+            <div class="circle c3"></div>
+            <div class="sweep"></div>
+            <span class="signal s1"></span>
+            <span class="signal s2"></span>
+            <span class="signal s3"></span>
+            <div class="radar-core">₹</div>
+          </div>
+
+          <div class="radar-footer">
+            <div><small>NEW</small><b id="radar-new-count">04</b></div>
+            <div><small>CHECKED</small><b id="radar-checked-count">42</b></div>
+            <div><small>CATEGORIES</small><b id="radar-cat-count">07</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="categories section" id="categories">
+      <div class="section-head">
+        <div>
+          <small>EXPLORE</small>
+          <h2>There is more than one way to earn.</h2>
+        </div>
+        <p>Choose by skill, effort, capital, time or risk.</p>
+      </div>
+
+      <div class="category-grid" id="category-grid-container">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <section class="feed section" id="feed">
+      <div class="feed-head">
+        <div><small>THE FEED</small><h2>Fresh opportunities, explained.</h2></div>
+        <div class="filters" id="feed-filter-buttons">
+          <button class="selected" data-cat="all">All</button>
+          <button data-cat="gaming">Gaming</button>
+          <button data-cat="freelancing">Freelance</button>
+          <button data-cat="creator">Creator</button>
+          <button data-cat="finance">Finance</button>
+        </div>
+      </div>
+
+      <div class="opportunity-list" id="opportunity-feed-list">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </section>
+
+    <section class="verify section" id="verify">
+      <div>
+        <small>THE TRUST LAYER</small>
+        <h2>Don't just share a method.<br><span>Show the whole picture.</span></h2>
+        <p>
+          Every listing can explain where it came from, what it needs, how much
+          effort it takes, what it costs, what can go wrong and whether earnings
+          are guaranteed (usually, they are not).
+        </p>
+
+        <div class="checks">
+          <div><b>✓</b><span><strong>Source shown</strong><small>Users can trace where the information came from.</small></span></div>
+          <div><b>✓</b><span><strong>Costs disclosed</strong><small>Entry fees, tools or capital requirements are visible.</small></span></div>
+          <div><b>✓</b><span><strong>Risk disclosed</strong><small>Financial and practical downside is not hidden.</small></span></div>
+          <div><b>✓</b><span><strong>Requirements clear</strong><small>Skills, eligibility, time and location are listed.</small></span></div>
+        </div>
+      </div>
+
+      <aside class="trust-card">
+        <div class="shield">✓</div>
+        <small>LISTING STANDARD</small>
+        <h3>Trust is a process,<br>not a green badge.</h3>
+        <div class="trust-row"><span>Source</span><b>Documented</b></div>
+        <div class="trust-row"><span>Risk</span><b>Disclosed</b></div>
+        <div class="trust-row"><span>Evidence</span><b>Attached</b></div>
+        <div class="warning">
+          <b>⚠ No guaranteed earnings</b>
+          <p>Results vary. Users should verify terms independently before paying, investing or sharing sensitive information.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="how section" id="how">
+      <div class="center-head">
+        <small>THE LOOP</small>
+        <h2>Discover → Verify → Decide.</h2>
+        <p>Built to help people act with information, not hype.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><span>01</span><i>⌕</i><h3>Discover</h3><p>Find an opportunity that matches your skills, time and budget.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>02</span><i>✓</i><h3>Verify</h3><p>Check source, terms, requirements, cost, risk and evidence.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>03</span><i>↗</i><h3>Decide</h3><p>Choose whether it makes sense for your own situation.</p></div>
+        <div class="connector"></div>
+        <div class="step"><span>04</span><i>＋</i><h3>Share</h3><p>Found something real? Add it with the full details.</p></div>
+      </div>
+    </section>
+
+    <section class="submit section" id="submit">
+      <div class="submit-box">
+        <div>
+          <small>COMMUNITY RADAR</small>
+          <h2>Found a method worth researching?</h2>
+          <p>Share the source, steps, requirements, cost, realistic earning model and risks. Make the next person's decision easier.</p>
+        </div>
+        <a class="btn primary" href="/share-method">Submit opportunity <b>↗</b></a>
+      </div>
+    </section>
+
+    <div class="disclaimer">
+      <b>⚠</b>
+      <p><strong>Important:</strong> EarnRadar is an information and discovery platform, not a guarantee of income. Investment and money-related opportunities can involve loss of capital. Never pay an unknown person, share OTPs/passwords, or trust a guaranteed-return claim without independent verification.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>Discover smarter. Verify harder. Decide for yourself.</span>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    let selectedCategory = 'all';
+
+    async function loadLandingPage() {
+      await initNavbar('/');
+
+      // Load Categories
+      try {
+        const catRes = await API.getCategories();
+        if (catRes.success && catRes.categories) {
+          const grid = document.getElementById('category-grid-container');
+          grid.innerHTML = catRes.categories.map((c, i) => `
+            <article class="category ${i === 0 ? 'active' : ''}" onclick="window.location.href='/opportunities?category=${c.slug}'">
+              <span>${c.icon || '🎯'}</span>
+              <div>
+                <b>${escapeHtml(c.name)}</b>
+                <p>${escapeHtml(c.description)}</p>
+              </div>
+              <strong>${String(c.opportunityCount).padStart(2, '0')}</strong>
+            </article>
+          `).join('');
+
+          document.getElementById('radar-cat-count').textContent = String(catRes.categories.length).padStart(2, '0');
+        }
+      } catch (err) {
+        console.error('Failed to load categories', err);
+      }
+
+      // Load Live Opportunities Feed
+      await loadFeed();
+
+      // Setup filter buttons
+      document.querySelectorAll('#feed-filter-buttons button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#feed-filter-buttons button').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedCategory = btn.getAttribute('data-cat');
+          loadFeed();
+        });
+      });
+    }
+
+    async function loadFeed() {
+      const feedContainer = document.getElementById('opportunity-feed-list');
+      feedContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--muted);">Scanning radar for live opportunities...</div>';
+
+      try {
+        const oppRes = await API.getOpportunities({ category: selectedCategory });
+        if (oppRes.success && oppRes.opportunities.length > 0) {
+          feedContainer.innerHTML = oppRes.opportunities.map(opp => {
+            const iconClass = opp.categorySlug === 'gaming' ? 'purple' : opp.categorySlug === 'freelancing' ? 'cyan' : opp.categorySlug === 'creator' ? 'pink' : 'green';
+            return `
+              <article class="opportunity ${opp.featured ? 'featured' : ''}" onclick="window.location.href='/opportunities/${opp.slug}'" style="cursor: pointer;">
+                <div class="opp-icon ${iconClass}">${opp.categoryIcon || '⚡'}</div>
+                <div class="opp-body">
+                  <div class="tags">
+                    <span class="verified">${opp.status}</span>
+                    <span>${escapeHtml(opp.category)}</span>
+                    <em>${formatTimeAgo(opp.createdAt)}</em>
+                  </div>
+                  <h3>${escapeHtml(opp.title)}</h3>
+                  <p>${escapeHtml(opp.description)}</p>
+                  <div class="meta">
+                    <span>⏱ ${escapeHtml(opp.timeRequired || 'Flexible')}</span>
+                    <span>🧠 ${escapeHtml(opp.skillsRequired?.split(',')[0] || 'Skill-based')}</span>
+                    <span>🌎 ${escapeHtml(opp.location || 'Online')}</span>
+                  </div>
+                </div>
+                <div class="opp-value">
+                  <small>POTENTIAL REWARD</small>
+                  <strong>${escapeHtml(opp.potentialEarning || 'Variable')}</strong>
+                  <label class="${opp.categorySlug === 'finance' ? 'danger' : ''}">${escapeHtml(opp.earningModel || 'REPORTED RESULT')}</label>
+                  <a href="/opportunities/${opp.slug}">View details →</a>
+                </div>
+              </article>
+            `;
+          }).join('');
+
+          document.getElementById('stat-listed').textContent = oppRes.opportunities.length;
+        } else {
+          feedContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--muted);">No opportunities found in this category yet.</div>';
+        }
+      } catch (err) {
+        console.error('Failed to load feed', err);
+        feedContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--red);">Unable to load feed. Please try again.</div>';
+      }
+    }
+
+    loadLandingPage();
+  </script>
+</body>
+</html>

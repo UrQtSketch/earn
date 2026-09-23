@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow" style="color: var(--cyan);"><i></i> RESTRICTED ACCESS • ADMIN CONSOLE</div>
+        <h1 style="font: 700 clamp(28px, 3.5vw, 40px) var(--font-heading);">Platform Moderation &amp; Auditing</h1>
+      </div>
+      <span class="status-pill approved" style="font-size: 11px; padding: 6px 12px;">🛡 Role: Administrator</span>
+    </div>
+
+    <!-- Admin Navigation Bar -->
+    <div class="admin-nav">
+      <a href="/admin" class="admin-nav-link active">📊 Overview</a>
+      <a href="/admin/submissions" class="admin-nav-link">📝 Submissions Moderation</a>
+      <a href="/admin/claims" class="admin-nav-link">💰 Earning Claims Review</a>
+      <a href="/admin/users" class="admin-nav-link">👥 User Management</a>
+      <a href="/admin/reports" class="admin-nav-link">🚨 Reports Queue</a>
+      <a href="/admin/analytics" class="admin-nav-link">📈 Analytics</a>
+      <a href="/admin/audit-log" class="admin-nav-link">📜 Audit Log</a>
+    </div>
+
+    <!-- Top Metrics Grid -->
+    <div class="stats-grid" id="metrics-grid">
+      <div class="stat-box">
+        <small>TOTAL USERS</small>
+        <strong id="m-users">--</strong>
+        <span id="m-active-users">-- active</span>
+      </div>
+
+      <div class="stat-box">
+        <small>PENDING SUBMISSIONS</small>
+        <strong id="m-pending-subs" style="color: var(--cyan);">--</strong>
+        <span>Requires moderator review</span>
+      </div>
+
+      <div class="stat-box">
+        <small>OPEN REPORTS</small>
+        <strong id="m-open-reports" style="color: var(--red);">--</strong>
+        <span>Scam / abuse reports</span>
+      </div>
+
+      <div class="stat-box">
+        <small>REPORTED EARNINGS</small>
+        <strong id="m-reported-earnings" style="color: var(--green);">--</strong>
+        <span>User-reported total</span>
+      </div>
+    </div>
+
+    <!-- Quick Action Queues -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+      <!-- Recent Pending Submissions -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font: 700 18px var(--font-heading);">Recent Submissions</h3>
+          <a href="/admin/submissions" style="font-size: 11px; color: var(--cyan); font-weight: 700;">View all →</a>
+        </div>
+        <div id="recent-subs-container" style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="color: var(--muted); font-size: 12px;">Loading submissions...</div>
+        </div>
+      </div>
+
+      <!-- Recent Open Reports -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font: 700 18px var(--font-heading); color: var(--red);">Pending Scam &amp; Abuse Reports</h3>
+          <a href="/admin/reports" style="font-size: 11px; color: var(--cyan); font-weight: 700;">View queue →</a>
+        </div>
+        <div id="recent-reports-container" style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="color: var(--muted); font-size: 12px;">Loading reports...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo, formatCurrency } from '/js/ui.js';
+
+    await initNavbar('/admin');
+
+    async function loadAdminOverview() {
+      try {
+        const session = await API.getSession();
+        if (!session.authenticated || (session.user.role !== 'ADMIN' && session.user.role !== 'MODERATOR')) {
+          showToast('Unauthorized access to admin console.', 'error');
+          setTimeout(() => window.location.href = '/', 1000);
+          return;
+        }
+
+        const res = await API.getAdminMetrics();
+        if (res.success) {
+          const s = res.stats;
+          document.getElementById('m-users').textContent = s.totalUsers;
+          document.getElementById('m-active-users').textContent = `${s.activeUsers} active`;
+          document.getElementById('m-pending-subs').textContent = s.pendingSubmissions;
+          document.getElementById('m-open-reports').textContent = s.openReports;
+          document.getElementById('m-reported-earnings').textContent = formatCurrency(s.totalReportedEarnings);
+
+          // Render Recent Submissions
+          const subContainer = document.getElementById('recent-subs-container');
+          if (res.recentSubmissions?.length > 0) {
+            subContainer.innerHTML = res.recentSubmissions.map(sub => `
+              <div style="padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.01); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <b style="font-size: 13px;">${escapeHtml(sub.title)}</b>
+                  <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">
+                    by ${escapeHtml(sub.author?.profile?.fullName || 'User')} • ${formatTimeAgo(sub.createdAt)}
+                  </div>
+                </div>
+                <span class="status-pill ${sub.status.toLowerCase()}">${sub.status}</span>
+              </div>
+            `).join('');
+          } else {
+            subContainer.innerHTML = '<div style="color: var(--muted); font-size: 12px;">No submissions in queue.</div>';
+          }
+
+          // Render Recent Reports
+          const repContainer = document.getElementById('recent-reports-container');
+          if (res.recentReports?.length > 0) {
+            repContainer.innerHTML = res.recentReports.map(rep => `
+              <div style="padding: 12px; border: 1px solid rgba(255,113,139,0.2); border-radius: 10px; background: rgba(255,113,139,0.02); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <b style="font-size: 12px; color: var(--red);">${escapeHtml(rep.reason)}</b>
+                  <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">
+                    Reported on ${rep.targetType} • ${formatTimeAgo(rep.createdAt)}
+                  </div>
+                </div>
+                <a class="btn danger sm" href="/admin/reports">Audit</a>
+              </div>
+            `).join('');
+          } else {
+            repContainer.innerHTML = '<div style="color: var(--green); font-size: 12px;">✓ No open scam/abuse reports.</div>';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadAdminOverview();
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborations — EarnRadar</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grid-bg"></div>
+
+  <header class="topbar"></header>
+
+  <main class="container" style="padding: 40px 0 80px;">
+    <div style="margin-bottom: 32px; border-bottom: 1px solid var(--line); padding-bottom: 24px;">
+      <div class="eyebrow"><i></i> TEAM UP &amp; WORK TOGETHER</div>
+      <h1 style="font: 700 clamp(28px, 3.5vw, 42px) var(--font-heading);">
+        Collaborations &amp; Connections
+      </h1>
+      <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+        Coordinate on opportunities, exchange techniques safely, and manage your partner requests.
+      </p>
+    </div>
+
+    <!-- Security Alert -->
+    <div class="warning" style="margin-bottom: 32px;">
+      <b>⚠ Privacy &amp; Payment Safeguard</b>
+      <p>
+        EarnRadar does NOT hold, transfer, or guarantee payments between users.
+        Never send money upfront to unverified individuals or share private login credentials.
+      </p>
+    </div>
+
+    <!-- Incoming Requests -->
+    <div style="margin-bottom: 40px;">
+      <h2 style="font: 700 20px var(--font-heading); margin-bottom: 16px;">Incoming Requests</h2>
+      <div id="incoming-requests-container" style="display: grid; gap: 12px;">
+        <div style="padding: 24px; text-align: center; color: var(--muted);">Loading incoming requests...</div>
+      </div>
+    </div>
+
+    <!-- Active Connections -->
+    <div>
+      <h2 style="font: 700 20px var(--font-heading); margin-bottom: 16px;">Your Active Connections</h2>
+      <div id="active-connections-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+        <div style="padding: 24px; text-align: center; color: var(--muted);">Loading connections...</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+    <span>© 2026 EarnRadar</span>
+  </footer>
+
+  <script type="module">
+    import { API } from '/js/api.js';
+    import { initNavbar, showToast, escapeHtml, formatTimeAgo } from '/js/ui.js';
+
+    await initNavbar('/collaborations');
+
+    async function loadCollaborations() {
+      const incomingContainer = document.getElementById('incoming-requests-container');
+      const connectionsContainer = document.getElementById('active-connections-container');
+
+      try {
+        const res = await API.getCollaborations();
+        if (res.success) {
+          // Render Incoming
+          const pendingIncoming = (res.incoming || []).filter(r => r.status === 'PENDING');
+          if (pendingIncoming.length > 0) {
+            incomingContainer.innerHTML = pendingIncoming.map(req => `
+              <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; gap: 14px; align-items: center;">
+                  <div class="avatar" style="width: 44px; height: 44px;">${(req.sender?.profile?.fullName || 'U').charAt(0).toUpperCase()}</div>
+                  <div>
+                    <strong style="font-size: 14px;">${escapeHtml(req.sender?.profile?.fullName || 'User')}</strong>
+                    <span style="font-size: 11px; color: var(--cyan); margin-left: 6px;">@${escapeHtml(req.sender?.profile?.username || 'user')}</span>
+                    <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">"${escapeHtml(req.message)}"</p>
+                    <span style="font-size: 10px; color: var(--dim);">Opportunity: <b>${escapeHtml(req.opportunity?.title || 'General')}</b></span>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn primary sm accept-btn" data-id="${req.id}">Accept &amp; Chat</button>
+                  <button class="btn secondary sm decline-btn" data-id="${req.id}">Decline</button>
+                </div>
+              </div>
+            `).join('');
+
+            document.querySelectorAll('.accept-btn').forEach(b => {
+              b.addEventListener('click', async () => {
+                const id = b.getAttribute('data-id');
+                const resp = await API.respondCollaboration(id, 'ACCEPT');
+                if (resp.success) {
+                  showToast('Request accepted! Opening messages...', 'success');
+                  setTimeout(() => window.location.href = '/messages', 800);
+                }
+              });
+            });
+
+            document.querySelectorAll('.decline-btn').forEach(b => {
+              b.addEventListener('click', async () => {
+                const id = b.getAttribute('data-id');
+                const resp = await API.respondCollaboration(id, 'DECLINE');
+                if (resp.success) {
+                  showToast('Request declined.', 'info');
+                  loadCollaborations();
+                }
+              });
+            });
+          } else {
+            incomingContainer.innerHTML = '<div style="padding: 20px; color: var(--muted); font-size: 13px;">No pending incoming collaboration requests.</div>';
+          }
+
+          // Render Active Connections
+          if (res.connections && res.connections.length > 0) {
+            connectionsContainer.innerHTML = res.connections.map(c => `
+              <div class="card" style="padding: 20px;">
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                  <div class="avatar" style="width: 38px; height: 38px;">${(c.name || 'U').charAt(0).toUpperCase()}</div>
+                  <div>
+                    <strong style="font-size: 14px;">${escapeHtml(c.name || 'User')}</strong>
+                    <div style="font-size: 11px; color: var(--cyan);">@${escapeHtml(c.username || 'user')}</div>
+                  </div>
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 14px;">Connected ${formatTimeAgo(c.connectedSince)}</div>
+                <a class="btn cyan sm" href="/messages" style="width: 100%;">💬 Message Partner</a>
+              </div>
+            `).join('');
+          } else {
+            connectionsContainer.innerHTML = '<div style="padding: 20px; color: var(--muted); font-size: 13px;">You have no active connections yet. Request collaboration on an opportunity to connect!</div>';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadCollaborations();
+  </script>
+</body>
+</html>

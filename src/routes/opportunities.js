@@ -553,6 +553,9 @@ router.get('/:idOrSlug', async (req, res) => {
               }
             }
           }
+        },
+        _count: {
+          select: { savedBy: true, memberships: true, comments: true, experiences: true }
         }
       }
     });

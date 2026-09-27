@@ -126,6 +126,15 @@ export const API = {
     return res.json();
   },
 
+  async postComment(opportunityId, content, parentId = null) {
+    const res = await fetch(`/api/discussions/opportunity/${opportunityId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, parentId })
+    });
+    return res.json();
+  },
+
   async matchOpportunities(answers) {
     const res = await fetch('/api/opportunities/match', {
       method: 'POST',

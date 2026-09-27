@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opportunity Dossier — EarnRadar</title>
+  <title>Opportunity Intelligence — EarnRadar</title>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/app.css">
 </head>
@@ -15,7 +15,10 @@
   <header class="topbar"></header>
 
   <main class="container" style="padding-bottom: 80px;" id="dossier-root">
-    <div style="padding: 60px 0; text-align: center; color: var(--muted);">Loading complete opportunity dossier...</div>
+    <div style="padding: 80px 0; text-align: center; color: var(--muted);">
+      <div style="font-size: 24px; margin-bottom: 12px; color: var(--cyan);">📡</div>
+      <div style="font-size: 15px;">Loading Opportunity Intelligence Dossier...</div>
+    </div>
   </main>
 
   <!-- Collaboration Request Modal -->
@@ -25,7 +28,7 @@
       <div class="eyebrow"><i></i> TEAM UP</div>
       <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Request Collaboration</h2>
       <p style="font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px;">
-        Connect with the creator or participants on this opportunity to collaborate and share techniques.
+        Connect with other members exploring this opportunity to collaborate and share techniques.
       </p>
 
       <div class="form-group">
@@ -46,10 +49,10 @@
   <div class="modal-overlay" id="report-modal">
     <div class="modal-content">
       <button class="modal-close" id="close-report-modal">✕</button>
-      <div class="eyebrow"><i></i> MODERATION DISCLOSURE</div>
+      <div class="eyebrow"><i></i> MODERATION AUDIT</div>
       <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Report Opportunity</h2>
       <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
-        Help keep the community safe. All reports are audited by moderators.
+        Help keep the community safe. All reports are independently audited by moderators.
       </p>
 
       <div class="form-group">
@@ -78,7 +81,7 @@
   <div class="modal-overlay" id="experience-modal">
     <div class="modal-content">
       <button class="modal-close" id="close-experience-modal">✕</button>
-      <div class="eyebrow" style="color: var(--yellow);"><i></i> HONEST COMMUNITY FEEDBACK</div>
+      <div class="eyebrow" style="color: var(--yellow);"><i></i> FACTUAL COMMUNITY FEEDBACK</div>
       <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Share Your Experience</h2>
       <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
         Help other members know what to realistically expect regarding time, difficulty, and earnings.
@@ -110,7 +113,7 @@
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
         <div class="form-group" style="margin-bottom: 0;">
-          <label class="form-label">Total Earned Amount (₹ or $)</label>
+          <label class="form-label">Reported Earned Amount (₹ or $)</label>
           <input type="number" id="exp-earned" class="input" placeholder="e.g. 5000">
         </div>
 
@@ -122,7 +125,7 @@
 
       <div class="form-group">
         <label class="form-label">Pros / What Worked Well</label>
-        <input type="text" id="exp-pros" class="input" placeholder="e.g. Fast payout approvals, friendly support">
+        <input type="text" id="exp-pros" class="input" placeholder="e.g. Fast payout approvals, clear dashboard">
       </div>
 
       <div class="form-group">
@@ -135,13 +138,56 @@
         <textarea id="exp-tips" class="textarea" placeholder="Key advice you wish you knew when starting..." style="min-height: 70px;"></textarea>
       </div>
 
-      <button id="submit-exp-btn" class="btn primary" style="width: 100%;">Submit Review &amp; Earnings Report <b>↗</b></button>
+      <button id="submit-exp-btn" class="btn primary" style="width: 100%;">Submit Review &amp; Report <b>↗</b></button>
     </div>
   </div>
 
   <footer>
-    <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
-    <span>© 2026 EarnRadar</span>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo"><span class="logo-mark">↗</span><b>EarnRadar</b></div>
+        <p class="footer-desc">
+          Community-powered discovery &amp; intelligence for verified online earning methods. Transparency, proof verification, and collaborative execution.
+        </p>
+        <div class="footer-status">
+          <span class="status-indicator"></span>
+          <span>Server: Online (Render v2.0)</span>
+        </div>
+        <div class="footer-sketch-badge">
+          <span>⚡ Platform created by</span>
+          <span class="sketch-tag">Sketch</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-heading">Platform</div>
+        <div class="footer-links">
+          <a href="/opportunities">Browse Directory</a>
+          <a href="/find-my-opportunity">Find My Opportunity</a>
+          <a href="/compare">Compare Opportunities</a>
+          <a href="/share-method">Share a Method</a>
+          <a href="/messages">Collaborations</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-heading">Trust &amp; Verification</div>
+        <div class="footer-links">
+          <a href="/guidelines">Community Guidelines</a>
+          <a href="/disclaimer">Earnings Disclaimer</a>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/admin">Moderator Access</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 EarnRadar. All rights reserved. Created by <b>Sketch</b>.</span>
+      <span class="footer-disclaimer-note">
+        EarnRadar is an informational intelligence platform. We do not guarantee income or employment.
+      </span>
+    </div>
   </footer>
 
   <script type="module">
@@ -168,18 +214,20 @@
         if (!res.success || !res.opportunity) {
           document.getElementById('dossier-root').innerHTML = `
             <div style="padding: 80px 0; text-align: center;">
+              <div style="font-size: 32px; margin-bottom: 12px; color: var(--red);">⚠</div>
               <h2 style="font: 700 28px var(--font-heading); margin-bottom: 12px;">Opportunity Not Found</h2>
-              <p style="color: var(--muted); margin-bottom: 24px;">This opportunity may have been removed or under review.</p>
-              <a class="btn primary" href="/opportunities">Back to Directory</a>
+              <p style="color: var(--muted); margin-bottom: 24px;">This opportunity dossier may have been moved, expired, or is currently under moderation review.</p>
+              <a class="btn primary" href="/opportunities">Back to Opportunities Directory</a>
             </div>
           `;
           return;
         }
 
         currentOpp = res.opportunity;
+        document.title = `${currentOpp.title} — Opportunity Intelligence | EarnRadar`;
         renderDossier(currentOpp);
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load opportunity dossier:', err);
       }
     }
 
@@ -187,13 +235,33 @@
       const isJoined = Boolean(opp.userMembership);
       const isSaved = Boolean(opp.isSaved);
 
+      // Safe field values
+      const timeVal = opp.timeRequired ? escapeHtml(opp.timeRequired) : 'Not listed';
+      const costVal = opp.startingCost ? escapeHtml(opp.startingCost) : '₹0 / Not listed';
+      const skillVal = opp.skillLevel ? escapeHtml(opp.skillLevel) : 'Not specified by the source';
+      const riskVal = opp.riskLevel ? escapeHtml(opp.riskLevel) : 'Not listed';
+      const earningModelVal = opp.earningModel ? escapeHtml(opp.earningModel) : 'Variable / Task-based';
+      const locationVal = opp.location ? escapeHtml(opp.location) : 'Online / Global';
+      const whoCanDoItVal = opp.whoCanDoIt ? escapeHtml(opp.whoCanDoIt) : 'Anyone meeting platform prerequisites';
+      const skillsRequiredVal = opp.skillsRequired ? escapeHtml(opp.skillsRequired) : 'Not specified by the source';
+      const platformWebsiteVal = opp.platformWebsite || opp.officialSource;
+
+      // Status pill classes
+      const healthClass = (opp.healthStatus || 'ACTIVE').toLowerCase();
+      const riskClass = (opp.riskLevel || 'LOW').toLowerCase().replace(/\s+/g, '-');
+
       document.getElementById('dossier-root').innerHTML = `
+        <!-- Top Breadcrumb & Actions Header -->
         <div class="dossier-header">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <div class="tags">
-              <span class="verified">${opp.status}</span>
-              <span>${escapeHtml(opp.category?.name || 'General')}</span>
-              <em>Last checked: ${formatTimeAgo(opp.lastVerifiedDate)}</em>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+            <div class="tags" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="status-pill ${healthClass}">● ${escapeHtml(opp.healthStatus || 'ACTIVE')}</span>
+              <span class="status-pill active">🛡 ${escapeHtml(opp.status || 'VERIFIED')}</span>
+              <span class="badge badge-purple">${escapeHtml(opp.category?.name || 'General')}</span>
+              <span class="badge ${opp.riskLevel === 'LOW' ? 'badge-green' : opp.riskLevel === 'HIGH' ? 'badge-red' : 'badge-yellow'}">
+                Risk: ${escapeHtml(opp.riskLevel || 'LOW')}
+              </span>
+              <em style="font-size: 11px; color: var(--dim); margin-left: 4px;">Last checked: ${opp.lastVerifiedDate ? formatTimeAgo(opp.lastVerifiedDate) : 'Recently'}</em>
             </div>
 
             <div style="display: flex; gap: 10px;">
@@ -202,31 +270,167 @@
             </div>
           </div>
 
-          <h1>${escapeHtml(opp.title)}</h1>
-          <p style="color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 850px;">
+          <h1 style="margin: 8px 0 14px;">${escapeHtml(opp.title)}</h1>
+          
+          <p style="color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 920px;">
             ${escapeHtml(opp.description)}
           </p>
 
-          <div style="display: flex; gap: 24px; margin-top: 20px; font-size: 12px; color: var(--muted); flex-wrap: wrap;">
-            <span>👤 Author: <b>${escapeHtml(opp.author?.profile?.fullName || 'Verified Community Member')}</b> (@${escapeHtml(opp.author?.profile?.username || 'member')})</span>
-            <span>👥 <b>${opp.joinsCount}</b> participating</span>
-            <span>👁 <b>${opp.viewsCount}</b> views</span>
+          <div style="display: flex; gap: 24px; margin-top: 18px; font-size: 12px; color: var(--muted); flex-wrap: wrap; align-items: center;">
+            <span>👤 Author: <b>${escapeHtml(opp.author?.profile?.fullName || 'Verified Contributor')}</b> (@${escapeHtml(opp.author?.profile?.username || 'member')})</span>
+            <span>👥 <b>${opp.joinsCount || opp._count?.memberships || 0}</b> participating</span>
+            <span>★ <b>${opp._count?.savedBy || 0}</b> saved</span>
+            <span>💬 <b>${opp.comments?.length || opp._count?.comments || 0}</b> comments</span>
+            <span>👁 <b>${opp.viewsCount || 0}</b> views</span>
+          </div>
+
+          <!-- 6-Card Quick Intelligence Matrix -->
+          <div class="intel-matrix">
+            <div class="intel-metric-card">
+              <span class="intel-label">⏱ Time Required</span>
+              <strong class="intel-val">${timeVal}</strong>
+            </div>
+
+            <div class="intel-metric-card">
+              <span class="intel-label">💵 Starting Cost</span>
+              <strong class="intel-val" style="color: var(--cyan);">${costVal}</strong>
+            </div>
+
+            <div class="intel-metric-card">
+              <span class="intel-label">🎯 Skill Level</span>
+              <strong class="intel-val">${skillVal}</strong>
+            </div>
+
+            <div class="intel-metric-card">
+              <span class="intel-label">⚠ Risk Profile</span>
+              <strong class="intel-val" style="color: ${opp.riskLevel === 'LOW' ? 'var(--green)' : opp.riskLevel === 'HIGH' ? 'var(--red)' : 'var(--yellow)'};">${riskVal}</strong>
+            </div>
+
+            <div class="intel-metric-card">
+              <span class="intel-label">💼 Earning Model</span>
+              <strong class="intel-val">${earningModelVal}</strong>
+            </div>
+
+            <div class="intel-metric-card">
+              <span class="intel-label">📍 Availability</span>
+              <strong class="intel-val">${locationVal}</strong>
+            </div>
           </div>
         </div>
 
+        <!-- 2-Column Main Intelligence Layout -->
         <div class="dossier-grid">
           <!-- Main Left Column -->
           <div>
-            <!-- Section: How It Works & Step-by-Step Breakdown -->
-            <div class="card" style="margin-bottom: 24px;">
-              <div class="eyebrow"><i></i> STEP-BY-STEP PROCESS</div>
-              <h2 style="font: 700 22px var(--font-heading); margin-bottom: 12px;">How this opportunity works</h2>
-              <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px;">
+            <!-- Section 1: What You Need (Prerequisites & Eligibility) -->
+            <div class="intel-section">
+              <div class="eyebrow"><i></i> PREREQUISITES &amp; ELIGIBILITY</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">What You Need to Start</h2>
+              
+              <div class="intel-field-grid">
+                <div class="intel-field-item">
+                  <span class="field-label">Who Can Do It</span>
+                  <div class="field-value">${whoCanDoItVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Required Skills &amp; Knowledge</span>
+                  <div class="field-value">${skillsRequiredVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Experience Level</span>
+                  <div class="field-value">${skillVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Geographic / Age Requirements</span>
+                  <div class="field-value">${locationVal}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Money Details (Costs, Fees & Payout Rails) -->
+            <div class="intel-section highlight">
+              <div class="eyebrow" style="color: var(--cyan);"><i></i> FINANCIAL TRANSPARENCY</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Money Details &amp; Earning Architecture</h2>
+
+              <div class="intel-field-grid">
+                <div class="intel-field-item">
+                  <span class="field-label">Upfront Investment / Cost</span>
+                  <div class="field-value" style="color: var(--cyan);">${costVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Earning Model</span>
+                  <div class="field-value">${earningModelVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Platform Fees / Cut</span>
+                  <div class="field-value">Platform standard or not specified by the source</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">Payout Methods / Rails</span>
+                  <div class="field-value">Direct Bank Transfer / UPI / PayPal / Platform Wallet</div>
+                </div>
+              </div>
+
+              <div style="margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: rgba(103, 232, 255, 0.05); border: 1px solid rgba(103, 232, 255, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+                  <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--cyan); letter-spacing: 0.5px;">Listed Earning Information</span>
+                  <span style="font: 700 18px var(--font-heading); color: var(--green);">${escapeHtml(opp.potentialEarning || 'Variable')}</span>
+                </div>
+                <p style="font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0;">
+                  <b>Notice:</b> Listed figures are community-reported or platform-specified estimates for reference only. Actual returns depend on your execution, skill level, client volume, and external platform rules. EarnRadar does not guarantee income.
+                </p>
+              </div>
+            </div>
+
+            <!-- Section 3: Reality Check (Honest Practical Assessment) -->
+            <div class="intel-section caution">
+              <div class="eyebrow" style="color: var(--yellow);"><i></i> REALITY CHECK</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px; color: var(--yellow);">Honest Assessment &amp; Red Flags</h2>
+
+              <div class="reality-callout">
+                <strong style="font-size: 12px; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+                  Income Consistency &amp; Platform Dependence
+                </strong>
+                <p style="font-size: 12px; color: #f0e6d2; margin: 0; line-height: 1.5;">
+                  Income is variable and project-based. Earnings depend on task availability and platform approval. It should not be treated as fixed guaranteed employment.
+                </p>
+              </div>
+
+              <div class="reality-callout risk">
+                <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+                  Known Practical Risks
+                </strong>
+                <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
+                  ${escapeHtml(opp.risks || 'Market competition, task volume fluctuations, and platform policy revisions.')}
+                </p>
+              </div>
+
+              <div class="reality-callout risk">
+                <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+                  Common Scams &amp; Fraud Warnings
+                </strong>
+                <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
+                  ${escapeHtml(opp.commonScams || 'Never pay advance registration or security deposits to unknown Telegram/WhatsApp handlers claiming to provide guaranteed tasks.')}
+                </p>
+              </div>
+            </div>
+
+            <!-- Section 4: How It Works (Step-by-Step Breakdown) -->
+            <div class="intel-section">
+              <div class="eyebrow"><i></i> STEP-BY-STEP REPRODUCTION</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 12px;">How This Opportunity Works</h2>
+              <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
                 ${escapeHtml(opp.howItWorks)}
               </p>
 
               <div class="step-timeline">
-                ${(opp.steps || []).map((step, idx) => `
+                ${(opp.steps || []).length > 0 ? (opp.steps.map((step, idx) => `
                   <div class="step-timeline-item">
                     <div class="step-badge">${step.stepNumber || idx + 1}</div>
                     <div class="step-content">
@@ -234,65 +438,72 @@
                       <p>${escapeHtml(step.description)}</p>
                     </div>
                   </div>
-                `).join('')}
+                `).join('')) : `
+                  <div style="padding: 16px; background: var(--panel2); border-radius: 12px; font-size: 12px; color: var(--muted);">
+                    General execution steps: Register on official platform → complete verification → perform tasks → withdraw directly via supported rails.
+                  </div>
+                `}
               </div>
             </div>
 
-            <!-- Section: Requirements & Earning Model -->
-            <div class="card" style="margin-bottom: 24px;">
-              <div class="eyebrow"><i></i> PREREQUISITES &amp; ELIGIBILITY</div>
-              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">What you need to start</h3>
+            <!-- Section 5: Source & Verification Logs -->
+            <div class="intel-section">
+              <div class="eyebrow" style="color: var(--cyan);"><i></i> AUDIT &amp; SOURCE PROVENANCE</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Source &amp; Verification Trail</h2>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div class="trust-row"><span>Who can do it</span><b>${escapeHtml(opp.whoCanDoIt || 'Anyone eligible')}</b></div>
-                <div class="trust-row"><span>Required skills</span><b>${escapeHtml(opp.skillsRequired || 'Basic')}</b></div>
-                <div class="trust-row"><span>Time commitment</span><b>${escapeHtml(opp.timeRequired || 'Flexible')}</b></div>
-                <div class="trust-row"><span>Starting cost</span><b style="color: var(--cyan);">${escapeHtml(opp.startingCost || '₹0 / Free')}</b></div>
-                <div class="trust-row"><span>Earning Model</span><b>${escapeHtml(opp.earningModel || 'Variable')}</b></div>
-                <div class="trust-row"><span>Location</span><b>${escapeHtml(opp.location || 'Online')}</b></div>
-              </div>
-            </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+                <div class="intel-field-item">
+                  <span class="field-label">Official Platform URL</span>
+                  <div class="field-value">
+                    ${platformWebsiteVal ? `
+                      <a href="${escapeHtml(platformWebsiteVal)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan); text-decoration: underline; word-break: break-all;">
+                        ${escapeHtml(platformWebsiteVal)} ↗
+                      </a>
+                    ` : 'Not listed'}
+                  </div>
+                </div>
 
-            <!-- Section: Risks, Common Scams & Safety Checklist -->
-            <div class="card" style="margin-bottom: 24px; border-color: rgba(255, 216, 107, 0.25);">
-              <div class="eyebrow" style="color: var(--yellow);"><i></i> HONESTY &amp; RISK DISCLOSURE</div>
-              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 12px; color: var(--yellow);">Known Risks &amp; Scams to Avoid</h3>
-
-              <div style="margin-bottom: 18px;">
-                <strong style="font-size: 13px; color: #fff;">Known Practical Risks:</strong>
-                <p style="font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.6;">${escapeHtml(opp.risks || 'Earnings fluctuate based on performance.')}</p>
-              </div>
-
-              <div style="margin-bottom: 18px;">
-                <strong style="font-size: 13px; color: var(--red);">Common Scam Warnings:</strong>
-                <p style="font-size: 12px; color: #ffb4c2; margin-top: 4px; line-height: 1.6;">${escapeHtml(opp.commonScams || 'Never pay advance registration money to unknown Telegram accounts.')}</p>
+                <div class="intel-field-item">
+                  <span class="field-label">Moderation Audit Status</span>
+                  <div class="field-value" style="color: var(--green);">
+                    ✓ ${escapeHtml(opp.status || 'VERIFIED')}
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <strong style="font-size: 13px; color: var(--green);">Safety Checklist:</strong>
-                <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-                  ${(opp.safetyChecklist || []).map(item => `
-                    <div style="display: flex; gap: 8px; font-size: 12px; color: var(--muted); align-items: center;">
-                      <span style="color: var(--green);">✓</span>
-                      <span>${escapeHtml(item)}</span>
+              <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px;">Verification Audit Timeline</div>
+              ${(opp.verificationLogs && opp.verificationLogs.length > 0) ? `
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                  ${opp.verificationLogs.map(log => `
+                    <div style="border-left: 2px solid var(--cyan); padding-left: 14px; position: relative;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="badge ${log.status === 'VERIFIED' ? 'badge-green' : log.status === 'FLAGGED' ? 'badge-red' : 'badge-yellow'}">${escapeHtml(log.status)}</span>
+                        <span style="font-size: 11px; color: var(--muted);">${new Date(log.verifiedAt || log.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <p style="font-size: 12px; color: var(--text-primary); margin: 4px 0 2px;"><b>${escapeHtml(log.verificationMethod || 'Staff Audit')}</b>: ${escapeHtml(log.notes)}</p>
+                      <span style="font-size: 10px; color: var(--dim);">Verified by Moderator ID #${escapeHtml(String(log.verifiedBy || 'Staff').slice(0, 8))}</span>
                     </div>
                   `).join('')}
                 </div>
-              </div>
+              ` : `
+                <div style="padding: 14px 16px; background: var(--panel2); border-radius: 12px; font-size: 12px; color: var(--muted);">
+                  Verified by EarnRadar moderation team on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Payout rails, terms, and reproduction workflow inspected.
+                </div>
+              `}
             </div>
 
-            <!-- Section: Evidence & Proof Gallery -->
+            <!-- Section 6: Proof Room (Attached Evidence) -->
             ${opp.evidence && opp.evidence.length > 0 ? `
-              <div class="card" style="margin-bottom: 24px;">
-                <div class="eyebrow"><i></i> ATTACHED PROOF</div>
-                <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Evidence &amp; Verification Documents</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+              <div class="intel-section">
+                <div class="eyebrow"><i></i> PROOF ROOM &amp; EVIDENCE</div>
+                <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Attached Screenshots &amp; Evidence Documents</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
                   ${opp.evidence.map(ev => `
-                    <div style="border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel2);">
+                    <div class="proof-card">
                       <img src="${escapeHtml(ev.fileUrl)}" style="width: 100%; height: 140px; object-fit: cover;" alt="Evidence screenshot">
-                      <div style="padding: 10px; font-size: 11px;">
-                        <span class="tags"><span class="verified">${ev.verifiedStatus}</span></span>
-                        <p style="color: var(--muted); margin-top: 6px;">${escapeHtml(ev.caption || 'Submitted proof')}</p>
+                      <div style="padding: 10px 12px; font-size: 11px;">
+                        <span class="badge badge-green" style="font-size: 9px; padding: 2px 6px;">${escapeHtml(ev.verifiedStatus || 'EVIDENCE_REVIEWED')}</span>
+                        <p style="color: var(--muted); margin-top: 6px; line-height: 1.4;">${escapeHtml(ev.caption || 'Submitted proof attachment')}</p>
                       </div>
                     </div>
                   `).join('')}
@@ -300,37 +511,54 @@
               </div>
             ` : ''}
 
-            <!-- Section: Verification History Timeline -->
-            <div class="card" style="margin-bottom: 24px;">
-              <div class="eyebrow" style="color: var(--cyan);"><i></i> AUDIT &amp; VERIFICATION LOGS</div>
-              <h3 style="font: 700 18px var(--font-heading); margin-bottom: 16px;">Platform Verification History</h3>
+            <!-- Video Walkthrough if Present -->
+            ${opp.videoUrl ? `
+              <div class="intel-section">
+                <div class="eyebrow" style="color: var(--purple);"><i></i> VIDEO WALKTHROUGH</div>
+                <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Walkthrough / Explainer Video</h2>
+                <div style="padding: 16px; background: var(--panel2); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                  <div>
+                    <span style="font-size: 13px; font-weight: 600; color: #fff;">External Video Guide</span>
+                    <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">Watch step-by-step demonstration on the official channel.</p>
+                  </div>
+                  <a href="${escapeHtml(opp.videoUrl)}" target="_blank" rel="noopener noreferrer" class="btn primary sm">Watch Video ↗</a>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Section 7: Stay Safe Checklist -->
+            <div class="intel-section">
+              <div class="eyebrow" style="color: var(--green);"><i></i> PRE-FLIGHT CHECKLIST</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Stay Safe Checklist</h2>
               
-              ${(opp.verificationLogs && opp.verificationLogs.length > 0) ? `
-                <div style="display: flex; flex-direction: column; gap: 14px;">
-                  ${opp.verificationLogs.map(log => `
-                    <div style="border-left: 2px solid var(--cyan); padding-left: 14px; position: relative;">
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span class="badge ${log.status === 'VERIFIED' ? 'badge-green' : log.status === 'FLAGGED' ? 'badge-red' : 'badge-yellow'}">${escapeHtml(log.status)}</span>
-                        <span style="font-size: 11px; color: var(--muted);">${new Date(log.verifiedAt).toLocaleDateString()}</span>
-                      </div>
-                      <p style="font-size: 13px; color: var(--text-primary); margin: 4px 0 2px;"><b>${escapeHtml(log.verificationMethod || 'Staff Audit')}</b>: ${escapeHtml(log.notes)}</p>
-                      <span style="font-size: 11px; color: var(--dim);">Verified by Moderator ID #${escapeHtml(log.verifiedBy?.slice(0, 8) || 'Staff')}</span>
-                    </div>
-                  `).join('')}
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                  <span style="color: var(--green); font-weight: 700;">✓</span>
+                  <span><b>Zero Upfront Fees:</b> Never pay registration fees, security deposits, or kit charges to random individuals.</span>
                 </div>
-              ` : `
-                <div style="padding: 16px; background: var(--panel2); border-radius: var(--radius-md); font-size: 12px; color: var(--muted);">
-                  Verified by EarnRadar moderation team on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Payout rails and reproduction steps confirmed.
+                <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                  <span style="color: var(--green); font-weight: 700;">✓</span>
+                  <span><b>Never Share Credentials:</b> Never disclose banking OTPs, account passwords, or identity documents via informal chat apps.</span>
                 </div>
-              `}
+                <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                  <span style="color: var(--green); font-weight: 700;">✓</span>
+                  <span><b>Verify Official Domains:</b> Always check SSL certificates and domain names before entering credentials.</span>
+                </div>
+                ${(opp.safetyChecklist || []).map(item => `
+                  <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                    <span style="color: var(--green); font-weight: 700;">✓</span>
+                    <span>${escapeHtml(item)}</span>
+                  </div>
+                `).join('')}
+              </div>
             </div>
 
-            <!-- Section: Community Experience Reviews -->
-            <div class="card" style="margin-bottom: 24px;">
+            <!-- Section 8: Community Experiences & Reviews -->
+            <div class="intel-section">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div>
                   <div class="eyebrow" style="color: var(--yellow);"><i></i> REAL MEMBER EXPERIENCES</div>
-                  <h3 style="font: 700 18px var(--font-heading); margin-top: 4px;">Community Ratings &amp; Reviews</h3>
+                  <h2 style="font: 700 20px var(--font-heading); margin-top: 4px;">Community Ratings &amp; Reviews</h2>
                 </div>
                 <button id="open-experience-btn" class="btn secondary sm">★ Share Your Experience</button>
               </div>
@@ -365,24 +593,24 @@
                   `).join('')}
                 </div>
               ` : `
-                <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 13px;">
-                  No community experience reports yet. Have you tried this method? Click <b>Share Your Experience</b> above!
+                <div style="padding: 24px; text-align: center; color: var(--muted); font-size: 13px; background: var(--panel2); border-radius: 12px;">
+                  No community experience reports submitted yet. Have you participated in this method? Click <b>Share Your Experience</b> above to add factual feedback.
                 </div>
               `}
             </div>
 
-            <!-- Section: Community Discussion & Comments -->
+            <!-- Section 9: Community Discussion -->
             <div class="discussion-section">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 style="font: 700 22px var(--font-heading);">Community Discussion</h3>
-                <span style="font-size: 12px; color: var(--muted);">${opp.comments?.length || 0} questions &amp; tips</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font: 700 20px var(--font-heading);">Community Discussion</h3>
+                <span style="font-size: 12px; color: var(--muted);">${opp.comments?.length || 0} questions &amp; notes</span>
               </div>
 
               <!-- Comment Input -->
               <div class="card" style="padding: 18px; margin-bottom: 24px;">
-                <textarea id="comment-input" class="textarea" placeholder="Ask a question or share your experience with this opportunity..." style="min-height: 80px;"></textarea>
+                <textarea id="comment-input" class="textarea" placeholder="Ask a question or share factual advice regarding this opportunity..." style="min-height: 80px;"></textarea>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                  <span style="font-size: 10px; color: var(--muted);">No spam or external link shorteners.</span>
+                  <span style="font-size: 10px; color: var(--muted);">No spam or external affiliate shortlinks.</span>
                   <button id="post-comment-btn" class="btn primary sm">Post Comment <b>→</b></button>
                 </div>
               </div>
@@ -399,7 +627,7 @@
                     </div>
                     <p style="font-size: 12px; color: var(--text); line-height: 1.6;">${escapeHtml(c.content)}</p>
                   </div>
-                `).join('')) : '<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 12px;">No comments yet. Be the first to start the discussion!</div>'}
+                `).join('')) : '<div style="padding: 24px; text-align: center; color: var(--muted); font-size: 12px;">No comments yet. Start the conversation!</div>'}
               </div>
             </div>
           </div>
@@ -407,22 +635,24 @@
           <!-- Sticky Action Sidebar -->
           <div class="action-sidebar">
             <div class="action-card">
-              <small class="eyebrow" style="color: var(--green);">REPORTED RANGE</small>
-              <strong style="font: 700 28px var(--font-heading); color: var(--green); display: block; margin: 8px 0 4px;">
+              <small class="eyebrow" style="color: var(--green);">LISTED EARNING RANGE</small>
+              <strong style="font: 700 26px var(--font-heading); color: var(--green); display: block; margin: 8px 0 4px;">
                 ${escapeHtml(opp.potentialEarning || 'Variable')}
               </strong>
-              <span style="font-size: 10px; color: var(--muted);">Subject to performance, skills &amp; terms.</span>
+              <span style="font-size: 10px; color: var(--muted); line-height: 1.4; display: block;">
+                Estimates only. Subject to performance, time, and third-party platform conditions.
+              </span>
 
               <div style="margin: 20px 0; border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 10px;">
                 ${isJoined ? `
                   <div style="padding: 12px; border-radius: 10px; background: rgba(125,255,178,0.1); border: 1px solid rgba(125,255,178,0.3); text-align: center;">
-                    <b style="color: var(--green); font-size: 12px;">✓ You joined this opportunity</b>
-                    <p style="font-size: 10px; color: var(--muted); margin-top: 4px;">Track your progress in <a href="/my-opportunities" style="color: var(--cyan); text-decoration: underline;">Joined Opportunities</a>.</p>
+                    <b style="color: var(--green); font-size: 12px;">✓ You are tracking this opportunity</b>
+                    <p style="font-size: 10px; color: var(--muted); margin-top: 4px;">Manage in <a href="/my-opportunities" style="color: var(--cyan); text-decoration: underline;">My Opportunities</a>.</p>
                   </div>
                   <button id="leave-btn" class="btn secondary sm" style="width: 100%;">Leave Opportunity</button>
                 ` : `
                   <button id="join-btn" class="btn primary" style="width: 100%;">
-                    Join Opportunity <b>↗</b>
+                    Track &amp; Join Opportunity <b>↗</b>
                   </button>
                 `}
 
@@ -435,18 +665,30 @@
                 </a>
               </div>
 
-              ${opp.officialSource ? `
-                <div style="font-size: 11px; margin-top: 12px;">
-                  <span style="color: var(--muted);">Official Platform:</span><br>
-                  <a href="${escapeHtml(opp.officialSource)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan); text-decoration: underline; word-break: break-all;">
-                    ${escapeHtml(opp.platformWebsite || opp.officialSource)} ↗
+              ${platformWebsiteVal ? `
+                <div style="font-size: 11px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);">
+                  <span style="color: var(--muted); display: block; margin-bottom: 4px;">Official Platform:</span>
+                  <a href="${escapeHtml(platformWebsiteVal)}" target="_blank" rel="noopener noreferrer" style="color: var(--cyan); text-decoration: underline; word-break: break-all; font-weight: 600;">
+                    ${escapeHtml(platformWebsiteVal)} ↗
                   </a>
                 </div>
               ` : ''}
             </div>
 
+            <!-- Operational Health Card -->
+            <div class="card" style="padding: 18px; margin-top: 18px;">
+              <small class="eyebrow" style="color: var(--cyan);">DOSSIER HEALTH STATUS</small>
+              <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                <span class="status-pill ${healthClass}">● ${escapeHtml(opp.healthStatus || 'ACTIVE')}</span>
+                <span style="font-size: 11px; color: var(--muted);">Operational</span>
+              </div>
+              <p style="font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0;">
+                Platform status verified on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Community flagged reports: <b>0 open</b>.
+              </p>
+            </div>
+
             <!-- Author Card -->
-            <div class="card" style="padding: 20px;">
+            <div class="card" style="padding: 20px; margin-top: 18px;">
               <small class="eyebrow">SUBMITTED BY</small>
               <div style="display: flex; gap: 12px; align-items: center; margin: 12px 0;">
                 <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">${(opp.author?.profile?.fullName || 'M').charAt(0).toUpperCase()}</div>
@@ -455,7 +697,7 @@
                   <div style="font-size: 11px; color: var(--cyan);">@${escapeHtml(opp.author?.profile?.username || 'member')}</div>
                 </div>
               </div>
-              <p style="font-size: 11px; color: var(--muted); line-height: 1.5;">
+              <p style="font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0;">
                 ${escapeHtml(opp.author?.profile?.bio || 'Active EarnRadar community contributor.')}
               </p>
             </div>

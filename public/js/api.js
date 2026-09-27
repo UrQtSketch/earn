@@ -265,11 +265,11 @@ export const API = {
   },
 
   // Reports
-  async submitReport(targetType, targetId, reason, details) {
+  async submitReport(targetType, targetId, reason, details, evidenceUrl = null) {
     const res = await fetch('/api/reports', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetType, targetId, reason, details })
+      body: JSON.stringify({ targetType, targetId, reason, details, evidenceUrl })
     });
     return res.json();
   },
@@ -345,6 +345,21 @@ export const API = {
 
   async updateAdminOpportunityHealth(opportunityId, data) {
     const res = await fetch(`/api/admin/opportunities/${opportunityId}/health`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  },
+
+  async getAdminEvidence(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`/api/admin/evidence?${query}`);
+    return res.json();
+  },
+
+  async updateAdminEvidence(evidenceId, data) {
+    const res = await fetch(`/api/admin/evidence/${evidenceId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)

@@ -149,11 +149,17 @@ model OpportunityEvidence {
   id             String      @id @default(uuid())
   opportunityId  String
   opportunity    Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  type           String      // SCREENSHOT, TRANSACTION, DOCUMENT, VIDEO
+  type           String      // SCREENSHOT, TRANSACTION, DOCUMENT, VIDEO, OFFICIAL_SOURCE, USER_SUBMITTED, COMMUNITY_REPORT, EXTERNAL_SOURCE
+  sourceType     String?     @default("USER_SUBMITTED") // OFFICIAL_SOURCE, USER_SUBMITTED, COMMUNITY_REPORT, EXTERNAL_SOURCE
+  status         String?     @default("REVIEWED") // SUBMITTED, UNDER_REVIEW, REVIEWED, REJECTED
   fileUrl        String
+  title          String?
   caption        String?
   verifiedStatus String      @default("USER_REPORTED") // UNVERIFIED, EVIDENCE_REVIEWED, VERIFIED_SOURCE, USER_REPORTED
+  adminNote      String?
   createdAt      DateTime    @default(now())
+
+  @@index([opportunityId, createdAt])
 }
 
 model OpportunityMembership {
@@ -288,7 +294,8 @@ model Report {
   targetId    String
   reason      String   // SCAM, FAKE_PROOF, MISLEADING_EARNINGS, BROKEN_METHOD, PAYMENT_ISSUE, SPAM, HARASSMENT, OTHER
   details     String?
-  status      String   @default("OPEN") // OPEN, UNDER_REVIEW, ACTION_TAKEN, DISMISSED
+  evidenceUrl String?
+  status      String   @default("OPEN") // OPEN, UNDER_REVIEW, RESOLVED, REJECTED, ACTION_TAKEN, DISMISSED
   resolution  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

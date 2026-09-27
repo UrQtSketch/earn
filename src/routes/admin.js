@@ -543,6 +543,80 @@ router.patch('/reports/:id', async (req, res) => {
 });
 
 /**
+ * List Evidence Submissions for Admin Moderation
+ */
+router.get('/evidence', async (req, res) => {
+  try {
+    const { status, verifiedStatus } = req.query;
+    const where = {};
+    if (status) where.status = status;
+    if (verifiedStatus) where.verifiedStatus = verifiedStatus;
+
+    const evidence = await prisma.opportunityEvidence.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        opportunity: {
+          select: { id: true, title: true, slug: true, healthStatus: true }
+        }
+      }
+    });
+
+    return res.json({ success: true, evidence });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * Review / Moderate Evidence (EVIDENCE_REVIEWED, REJECTED, VERIFIED_SOURCE, UNVERIFIED)
+ */
+router.patch('/evidence/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { verifiedStatus, status = 'REVIEWED', adminNote } = req.body;
+
+    const allowedStatuses = ['UNVERIFIED', 'EVIDENCE_REVIEWED', 'VERIFIED_SOURCE', 'USER_REPORTED', 'REJECTED'];
+    if (verifiedStatus && !allowedStatuses.includes(verifiedStatus)) {
+      return res.status(400).json({ success: false, error: 'Invalid evidence verified status.' });
+    }
+
+    const evidence = await prisma.opportunityEvidence.update({
+      where: { id },
+      data: {
+        verifiedStatus: verifiedStatus || undefined,
+        status,
+        adminNote: adminNote?.trim() || null
+      },
+      include: { opportunity: true }
+    });
+
+    await createAuditLog({
+      adminId: req.user.id,
+      action: `EVIDENCE_${verifiedStatus || status}`,
+      targetType: 'EVIDENCE',
+      targetId: id,
+      details: {
+        opportunityId: evidence.opportunityId,
+        opportunityTitle: evidence.opportunity.title,
+        verifiedStatus: evidence.verifiedStatus,
+        status: evidence.status,
+        adminNote
+      },
+      req
+    });
+
+    return res.json({
+      success: true,
+      message: 'Evidence status updated and recorded in audit log.',
+      evidence
+    });
+  } catch (err) {
+    return res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * List Audit Logs
  */
 router.get('/audit-logs', async (req, res) => {

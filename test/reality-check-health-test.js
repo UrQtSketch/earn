@@ -56,7 +56,7 @@ async function runRealityCheckAndHealthTests() {
 
   // 4. Test Zero False Promises & Non-Guaranteed Disclaimers
   console.log('\n3️⃣ [PUBLIC TRUST & ZERO GUARANTEE COMPLIANCE]');
-  assert.ok(!htmlText.includes('Guaranteed Income'), 'Must not contain Guaranteed Income promise');
+  assert.ok(!htmlText.includes('Guaranteed earnings'), 'Must not contain Guaranteed earnings promise');
   assert.ok(!htmlText.includes('Easy money score'), 'Must not contain Easy money score');
   assert.ok(!htmlText.includes('Success probability'), 'Must not contain fake Success probability');
   assert.ok(htmlText.includes('EarnRadar information does not guarantee income'), 'Must contain non-guaranteed income disclosure');

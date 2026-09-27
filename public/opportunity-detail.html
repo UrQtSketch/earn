@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opportunity Intelligence &amp; Reality Check — EarnRadar</title>
+  <title>Opportunity Intelligence, Proof Room &amp; Scam Watch — EarnRadar</title>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/app.css">
 </head>
@@ -45,35 +45,47 @@
     </div>
   </div>
 
-  <!-- Report Opportunity Modal -->
+  <!-- Report Opportunity Modal (Report Intelligence) -->
   <div class="modal-overlay" id="report-modal">
     <div class="modal-content">
       <button class="modal-close" id="close-report-modal">✕</button>
-      <div class="eyebrow"><i></i> MODERATION AUDIT</div>
-      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 16px;">Report Opportunity</h2>
-      <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
-        Help keep the community safe. All reports are independently audited by moderators.
+      <div class="eyebrow" style="color: var(--yellow);"><i></i> REPORT INTELLIGENCE</div>
+      <h2 style="font: 700 22px var(--font-heading); margin: 8px 0 14px;">Report Opportunity</h2>
+      <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 18px; line-height: 1.5;">
+        Help keep EarnRadar accurate and safe. All reports are independently investigated by moderators. A report does not automatically imply fraud.
       </p>
 
       <div class="form-group">
-        <label class="form-label">Reason</label>
+        <label class="form-label">Reason for Report</label>
         <select id="report-reason" class="select">
-          <option value="SCAM">Suspected Scam / Phishing</option>
-          <option value="FAKE_PROOF">Fake / Altered Proof Screenshots</option>
-          <option value="MISLEADING_EARNINGS">Misleading Earnings Claim</option>
-          <option value="BROKEN_METHOD">Broken / Expired Method</option>
-          <option value="PAYMENT_ISSUE">Payment / Withdrawal Refusal</option>
-          <option value="SPAM">Spam / Unsolicited Affiliate</option>
-          <option value="OTHER">Other Violation</option>
+          <option value="INCORRECT_INFO">1. Incorrect information</option>
+          <option value="OUTDATED_INFO">2. Outdated information / Expired terms</option>
+          <option value="BROKEN_SOURCE">3. Broken or unreachable official source</option>
+          <option value="MISLEADING_EARNINGS">4. Misleading earning claim</option>
+          <option value="SUSPICIOUS_PAYMENT">5. Suspicious payment / deposit request</option>
+          <option value="SCAM">6. Scam / Phishing concern</option>
+          <option value="FAKE_PROOF">7. Fake or altered evidence screenshot</option>
+          <option value="UNSAFE_BEHAVIOR">8. Unsafe platform behavior</option>
+          <option value="PRIVACY_CONCERN">9. Privacy / Personal data concern</option>
+          <option value="OTHER">10. Other violation</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Additional Details</label>
-        <textarea id="report-details" class="textarea" placeholder="Describe the issue with links or evidence..."></textarea>
+        <label class="form-label">Evidence / Link (Optional)</label>
+        <input type="url" id="report-evidence-url" class="input" placeholder="https://example.com/proof-or-discussion">
       </div>
 
-      <button id="submit-report-btn" class="btn danger" style="width: 100%;">Submit Report for Moderation</button>
+      <div class="form-group">
+        <label class="form-label">Factual Description</label>
+        <textarea id="report-details" class="textarea" placeholder="Explain the specific issue with dates, links, or facts..." style="min-height: 80px;"></textarea>
+      </div>
+
+      <div style="padding: 10px 12px; background: rgba(255, 216, 107, 0.08); border: 1px solid rgba(255, 216, 107, 0.25); border-radius: 8px; font-size: 11px; color: #f0e6d2; margin-bottom: 18px;">
+        <b>🔒 Privacy Reminder:</b> Do not include passwords, OTPs, bank details, or private financial credentials.
+      </div>
+
+      <button id="submit-report-btn" class="btn danger" style="width: 100%;">Submit Report for Moderation <b>↗</b></button>
     </div>
   </div>
 
@@ -438,7 +450,7 @@
                 </div>
               </div>
 
-              <!-- Finance / Investment Risk Box (Part G) -->
+              <!-- Finance / Investment Risk Box -->
               ${isFinance ? `
                 <div class="finance-risk-box">
                   <div class="risk-icon">⚠</div>
@@ -460,7 +472,56 @@
               </div>
             </div>
 
-            <!-- Section 2: What You Need (Prerequisites & Eligibility) -->
+            <!-- Section 2: Scam Watch (Educational Safety Layer) -->
+            <div class="scam-watch-panel">
+              <div class="eyebrow" style="color: var(--red);"><i></i> EDUCATIONAL SAFETY LAYER</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 10px; color: #ff8599;">Scam Watch &amp; Warning Signs</h2>
+              <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 14px; line-height: 1.5;">
+                Watch for common warning signs associated with online earning tasks. Potential warning signs do not automatically mean an opportunity is fraudulent.
+              </p>
+
+              <div class="scam-flag-item">
+                <span class="flag-icon">⚠</span>
+                <div>
+                  <strong style="font-size: 12px; color: #fff; display: block; margin-bottom: 2px;">Upfront Payment Requests</strong>
+                  <p style="font-size: 11.5px; color: #f0e6d2; margin: 0; line-height: 1.4;">
+                    Be cautious if someone asks you to pay before receiving access, registration, or a withdrawal. Legitimate platforms typically charge zero entry fees.
+                  </p>
+                </div>
+              </div>
+
+              <div class="scam-flag-item">
+                <span class="flag-icon">⚠</span>
+                <div>
+                  <strong style="font-size: 12px; color: #fff; display: block; margin-bottom: 2px;">Guaranteed Income Claims</strong>
+                  <p style="font-size: 11.5px; color: #f0e6d2; margin: 0; line-height: 1.4;">
+                    Guaranteed income claims should be independently checked. Real earnings always depend on market volume and execution.
+                  </p>
+                </div>
+              </div>
+
+              <div class="scam-flag-item">
+                <span class="flag-icon">🔒</span>
+                <div>
+                  <strong style="font-size: 12px; color: #fff; display: block; margin-bottom: 2px;">OTP &amp; Password Confidentiality</strong>
+                  <p style="font-size: 11.5px; color: #f0e6d2; margin: 0; line-height: 1.4;">
+                    Never share account passwords, OTPs, or private recovery phrases with anyone claiming to represent support or task managers.
+                  </p>
+                </div>
+              </div>
+
+              <div class="scam-flag-item">
+                <span class="flag-icon">🔗</span>
+                <div>
+                  <strong style="font-size: 12px; color: #fff; display: block; margin-bottom: 2px;">Off-Platform Contact &amp; Unofficial Channels</strong>
+                  <p style="font-size: 11.5px; color: #f0e6d2; margin: 0; line-height: 1.4;">
+                    Always verify official domains directly and avoid redirecting payments through unverified personal UPI or crypto addresses.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: What You Need (Prerequisites & Eligibility) -->
             <div class="intel-section">
               <div class="eyebrow"><i></i> PREREQUISITES &amp; ELIGIBILITY</div>
               <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">What You Need to Start</h2>
@@ -488,7 +549,7 @@
               </div>
             </div>
 
-            <!-- Section 3: Money Details (Costs, Fees & Payout Rails) -->
+            <!-- Section 4: Money Details (Costs, Fees & Payout Rails) -->
             <div class="intel-section highlight">
               <div class="eyebrow" style="color: var(--cyan);"><i></i> FINANCIAL TRANSPARENCY</div>
               <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Money Details &amp; Payout Rails</h2>
@@ -526,7 +587,7 @@
               </div>
             </div>
 
-            <!-- Section 4: How It Works (Step-by-Step Breakdown) -->
+            <!-- Section 5: How It Works (Step-by-Step Breakdown) -->
             <div class="intel-section">
               <div class="eyebrow"><i></i> STEP-BY-STEP REPRODUCTION</div>
               <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 12px;">How This Opportunity Works</h2>
@@ -551,7 +612,90 @@
               </div>
             </div>
 
-            <!-- Section 5: Source & Verification Timeline (Part C) -->
+            <!-- Section 6: Proof Room (Attached Evidence) -->
+            <div class="intel-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <div class="eyebrow" style="color: var(--cyan);"><i></i> EVIDENCE &amp; EXPERIENCES</div>
+                  <h2 style="font: 700 20px var(--font-heading); margin-top: 4px;">Proof Room</h2>
+                </div>
+                <span style="font-size: 12px; color: var(--muted);">${opp.evidence?.length || 0} evidence document(s)</span>
+              </div>
+
+              ${(opp.evidence && opp.evidence.length > 0) ? `
+                <div class="proof-room-grid">
+                  ${opp.evidence.map(ev => {
+                    const srcType = ev.sourceType || 'USER_SUBMITTED';
+                    let labelText = 'User-submitted evidence — not independently verified.';
+                    let badgeClass = 'badge-yellow';
+
+                    if (srcType === 'OFFICIAL_SOURCE') {
+                      labelText = 'Official source';
+                      badgeClass = 'badge-cyan';
+                    } else if (ev.verifiedStatus === 'EVIDENCE_REVIEWED' || ev.verifiedStatus === 'VERIFIED_SOURCE') {
+                      labelText = 'Evidence reviewed by EarnRadar';
+                      badgeClass = 'badge-green';
+                    } else if (srcType === 'COMMUNITY_REPORT') {
+                      labelText = 'Community report';
+                      badgeClass = 'badge-purple';
+                    }
+
+                    return `
+                      <div class="proof-card">
+                        <div class="proof-preview-container">
+                          ${ev.fileUrl ? `
+                            <img src="${escapeHtml(ev.fileUrl)}" alt="Evidence preview" onerror="this.src='/logo.svg'; this.style.opacity='0.4';">
+                          ` : `
+                            <span style="color: var(--muted); font-size: 12px;">Document Preview</span>
+                          `}
+                        </div>
+                        <div class="proof-card-body">
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span class="badge ${badgeClass}" style="font-size: 9px; padding: 2px 6px;">${escapeHtml(ev.status || 'REVIEWED')}</span>
+                            <span style="font-size: 10px; color: var(--dim);">${new Date(ev.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <strong style="font-size: 13px; color: #fff;">${escapeHtml(ev.title || ev.caption || 'Evidence Document')}</strong>
+                          <p style="font-size: 11px; color: var(--muted); line-height: 1.4; margin: 0;">${escapeHtml(ev.caption || 'Submitted document')}</p>
+                          <div class="proof-source-tag" style="margin-top: 6px; font-size: 10px; color: var(--cyan);">
+                            ${labelText}
+                          </div>
+                          ${ev.fileUrl ? `
+                            <a href="${escapeHtml(ev.fileUrl)}" target="_blank" rel="noopener noreferrer" class="btn secondary sm" style="margin-top: 10px; justify-content: center; font-size: 11px;">
+                              Open Evidence ↗
+                            </a>
+                          ` : ''}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+                <div style="margin-top: 14px; padding: 10px 14px; background: rgba(255,255,255,0.02); border-radius: 8px; font-size: 11px; color: var(--dim);">
+                  ⚠ <b>Notice on Earnings:</b> Displayed earnings are not a guarantee of future results. Community-reported amount.
+                </div>
+              ` : `
+                <div style="padding: 24px; text-align: center; color: var(--muted); font-size: 13px; background: var(--panel2); border-radius: 12px;">
+                  <p style="margin-bottom: 6px; font-weight: 600; color: var(--text-primary);">No evidence has been submitted yet.</p>
+                  <span style="font-size: 12px; color: var(--muted);">Check the official source and community experiences before participating.</span>
+                </div>
+              `}
+            </div>
+
+            <!-- Video Walkthrough if Present -->
+            ${opp.videoUrl ? `
+              <div class="intel-section">
+                <div class="eyebrow" style="color: var(--purple);"><i></i> VIDEO WALKTHROUGH</div>
+                <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Walkthrough / Explainer Video</h2>
+                <div style="padding: 16px; background: var(--panel2); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                  <div>
+                    <span style="font-size: 13px; font-weight: 600; color: #fff;">External Video Guide</span>
+                    <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">Watch step-by-step demonstration on the official channel.</p>
+                  </div>
+                  <a href="${escapeHtml(opp.videoUrl)}" target="_blank" rel="noopener noreferrer" class="btn primary sm">Watch Video ↗</a>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Section 7: Source & Verification Timeline -->
             <div class="intel-section">
               <div class="eyebrow" style="color: var(--cyan);"><i></i> AUDIT &amp; SOURCE PROVENANCE</div>
               <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Source &amp; Verification History</h2>
@@ -597,68 +741,36 @@
               `}
             </div>
 
-            <!-- Section 6: Proof Room (Attached Evidence) -->
-            ${opp.evidence && opp.evidence.length > 0 ? `
-              <div class="intel-section">
-                <div class="eyebrow"><i></i> PROOF ROOM &amp; EVIDENCE</div>
-                <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Attached Screenshots &amp; Evidence Documents</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
-                  ${opp.evidence.map(ev => `
-                    <div class="proof-card">
-                      <img src="${escapeHtml(ev.fileUrl)}" style="width: 100%; height: 140px; object-fit: cover;" alt="Evidence screenshot">
-                      <div style="padding: 10px 12px; font-size: 11px;">
-                        <span class="badge badge-green" style="font-size: 9px; padding: 2px 6px;">${escapeHtml(ev.verifiedStatus || 'EVIDENCE_REVIEWED')}</span>
-                        <p style="color: var(--muted); margin-top: 6px; line-height: 1.4;">${escapeHtml(ev.caption || 'Submitted proof attachment')}</p>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            ` : ''}
-
-            <!-- Video Walkthrough if Present -->
-            ${opp.videoUrl ? `
-              <div class="intel-section">
-                <div class="eyebrow" style="color: var(--purple);"><i></i> VIDEO WALKTHROUGH</div>
-                <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Walkthrough / Explainer Video</h2>
-                <div style="padding: 16px; background: var(--panel2); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                  <div>
-                    <span style="font-size: 13px; font-weight: 600; color: #fff;">External Video Guide</span>
-                    <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">Watch step-by-step demonstration on the official channel.</p>
-                  </div>
-                  <a href="${escapeHtml(opp.videoUrl)}" target="_blank" rel="noopener noreferrer" class="btn primary sm">Watch Video ↗</a>
-                </div>
-              </div>
-            ` : ''}
-
-            <!-- Section 7: Stay Safe Checklist -->
-            <div class="intel-section">
-              <div class="eyebrow" style="color: var(--green);"><i></i> PRE-FLIGHT CHECKLIST</div>
-              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Stay Safe Checklist</h2>
+            <!-- Section 8: Reusable Safety Center (Stay Safe on EarnRadar) -->
+            <div class="safety-center-card">
+              <div class="eyebrow" style="color: var(--green);"><i></i> PLATFORM SAFETY DIRECTIVE</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px; color: #9effc7;">Stay Safe on EarnRadar</h2>
               
               <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
                   <span style="color: var(--green); font-weight: 700;">✓</span>
-                  <span><b>Zero Upfront Fees:</b> Never pay registration fees, security deposits, or kit charges to random individuals.</span>
+                  <span><b>Never Share OTPs or Passwords:</b> EarnRadar staff and real clients will never ask for your account password or banking OTPs.</span>
                 </div>
                 <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
                   <span style="color: var(--green); font-weight: 700;">✓</span>
-                  <span><b>Never Share Credentials:</b> Never disclose banking OTPs, account passwords, or identity documents via informal chat apps.</span>
+                  <span><b>Zero Upfront Fees:</b> Be cautious of any requirement to deposit funds or purchase starter kits to unlock tasks.</span>
                 </div>
                 <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
                   <span style="color: var(--green); font-weight: 700;">✓</span>
-                  <span><b>Verify Official Domains:</b> Always check SSL certificates and domain names before entering credentials.</span>
+                  <span><b>Verify Official URLs:</b> Always inspect SSL certificates and official domain spellings before entering details.</span>
                 </div>
-                ${(opp.safetyChecklist || []).map(item => `
-                  <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
-                    <span style="color: var(--green); font-weight: 700;">✓</span>
-                    <span>${escapeHtml(item)}</span>
-                  </div>
-                `).join('')}
+                <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                  <span style="color: var(--green); font-weight: 700;">✓</span>
+                  <span><b>Check Withdrawal Conditions:</b> Inspect payout thresholds, supported payment methods, and fees before investing significant effort.</span>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 12px; color: var(--text-primary); align-items: flex-start;">
+                  <span style="color: var(--green); font-weight: 700;">✓</span>
+                  <span><b>Report Suspicious Activity:</b> Use the Report button to flag suspicious payment requests, broken links, or fake proof for audit.</span>
+                </div>
               </div>
             </div>
 
-            <!-- Section 8: Community Experiences & Reviews -->
+            <!-- Section 9: Community Experiences & Reviews -->
             <div class="intel-section">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div>
@@ -704,7 +816,7 @@
               `}
             </div>
 
-            <!-- Section 9: Community Discussion -->
+            <!-- Section 10: Community Discussion -->
             <div class="discussion-section">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font: 700 20px var(--font-heading);">Community Discussion</h3>
@@ -939,7 +1051,7 @@
         });
       }
 
-      // Report Modal
+      // Report Modal & Handler
       const reportBtn = document.getElementById('report-btn');
       const reportModal = document.getElementById('report-modal');
       const closeReportModal = document.getElementById('close-report-modal');
@@ -958,15 +1070,23 @@
         submitReportBtn.addEventListener('click', async () => {
           const reason = document.getElementById('report-reason').value;
           const details = document.getElementById('report-details').value.trim();
+          const evidenceUrl = document.getElementById('report-evidence-url').value.trim();
+
+          if (!details) {
+            showToast('Please provide factual details for your report.', 'error');
+            return;
+          }
 
           submitReportBtn.disabled = true;
           try {
-            const res = await API.submitReport('OPPORTUNITY', currentOpp.id, reason, details);
+            const res = await API.submitReport('OPPORTUNITY', currentOpp.id, reason, details, evidenceUrl || null);
             if (res.success) {
               showToast(res.message, 'success');
               reportModal.classList.remove('show');
+              document.getElementById('report-details').value = '';
+              document.getElementById('report-evidence-url').value = '';
             } else {
-              showToast(res.error || 'Failed to file report.', 'error');
+              showToast(res.error || 'Failed to submit report.', 'error');
             }
           } catch (err) {
             showToast(err.message, 'error');

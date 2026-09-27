@@ -79,8 +79,9 @@ app.get('/my-opportunities', (req, res) => res.sendFile(path.join(publicDir, 'my
 app.get('/collaborations', (req, res) => res.sendFile(path.join(publicDir, 'collaborations.html')));
 app.get('/messages', (req, res) => res.sendFile(path.join(publicDir, 'messages.html')));
 app.get('/profile', (req, res) => res.sendFile(path.join(publicDir, 'profile.html')));
-app.get('/profile/:username', (req, res) => res.sendFile(path.join(publicDir, 'profile.html')));
 app.get('/settings', (req, res) => res.sendFile(path.join(publicDir, 'settings.html')));
+app.get('/find-my-opportunity', (req, res) => res.sendFile(path.join(publicDir, 'find-my-opportunity.html')));
+app.get('/find', (req, res) => res.sendFile(path.join(publicDir, 'find-my-opportunity.html')));
 
 // Admin UI Routes
 app.get('/admin', (req, res) => res.sendFile(path.join(publicDir, 'admin/index.html')));

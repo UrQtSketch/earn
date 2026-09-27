@@ -126,6 +126,15 @@ export const API = {
     return res.json();
   },
 
+  async matchOpportunities(answers) {
+    const res = await fetch('/api/opportunities/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(answers)
+    });
+    return res.json();
+  },
+
   // 9-Step Submissions
   async getMySubmissions() {
     const res = await fetch('/api/submissions/my');

@@ -36,6 +36,275 @@ router.get('/categories', async (req, res) => {
 });
 
 /**
+ * Factual Matching Engine for "Find My Opportunity"
+ */
+function calculateOpportunityMatch(opp, answers) {
+  let score = 0;
+  const matchReasons = [];
+
+  const oppCategorySlug = opp.category?.slug?.toLowerCase() || '';
+  const oppTime = (opp.timeRequired || '').toLowerCase();
+  const oppCost = (opp.startingCost || '').toLowerCase();
+  const oppSkills = (opp.skillsRequired || '').toLowerCase();
+  const oppWho = (opp.whoCanDoIt || '').toLowerCase();
+  const oppTitle = (opp.title || '').toLowerCase();
+  const oppDesc = (opp.description || '').toLowerCase();
+  const oppEarningModel = (opp.earningModel || '').toLowerCase();
+  const oppLocation = (opp.location || '').toLowerCase();
+  const isFree = oppCost.includes('₹0') || oppCost.includes('$0') || oppCost.includes('free') || oppCost.includes('0');
+
+  // 1. Daily Time Commitment Match
+  const userTime = answers.dailyTime;
+  if (userTime) {
+    if (userTime === 'less-than-1h') {
+      if (oppTime.includes('min') || oppTime.includes('task') || oppTime.includes('flexible') || oppCategorySlug === 'quick-gigs' || oppTime.includes('less than') || oppTime.includes('1 hr') || oppTime.includes('1h')) {
+        score += 30;
+        matchReasons.push(`Fits your daily time budget (${opp.timeRequired || 'Flexible'})`);
+      } else {
+        score += 10;
+        matchReasons.push(`Can be done flexibly around your schedule`);
+      }
+    } else if (userTime === '1-2h') {
+      if (oppTime.includes('1–2') || oppTime.includes('1-2') || oppTime.includes('flexible') || oppTime.includes('hr')) {
+        score += 30;
+        matchReasons.push(`Matches your 1–2 hours daily availability (${opp.timeRequired || '1–2 hrs'})`);
+      } else {
+        score += 15;
+        matchReasons.push(`Manageable within your selected daily schedule`);
+      }
+    } else if (userTime === '2-4h' || userTime === '4h-plus') {
+      score += 30;
+      matchReasons.push(`Fits your available ${userTime === '2-4h' ? '2–4 hours' : '4+ hours'} daily commitment (${opp.timeRequired || 'Active'})`);
+    }
+  }
+
+  // 2. Skills Match
+  const userSkills = Array.isArray(answers.skills) ? answers.skills.map(s => String(s).toLowerCase().trim()) : [];
+  if (userSkills.length > 0) {
+    let skillMatched = false;
+    if (userSkills.includes('beginner') || userSkills.includes('no-specific-skill') || userSkills.includes('none')) {
+      if (opp.skillLevel === 'BEGINNER' || oppWho.includes('anyone') || oppWho.includes('eligible') || isFree) {
+        score += 25;
+        matchReasons.push('Beginner-friendly with step-by-step instructions');
+        skillMatched = true;
+      }
+    }
+
+    const skillKeywordMap = {
+      'gaming': ['game', 'gaming', 'esports', 'bgmi', 'tournament', 'player'],
+      'coding': ['code', 'coding', 'tech', 'developer', 'programming', 'software', 'api', 'bounty', 'vulnerability', 'web'],
+      'writing': ['write', 'writing', 'copywriting', 'content', 'script', 'article', 'blog'],
+      'designing': ['design', 'thumbnail', 'ui', 'figma', 'graphics', 'photoshop', 'canvas'],
+      'video-editing': ['video', 'editing', 'premiere', 'capcut', 'reels', 'shorts', 'youtube', 'sound'],
+      'social-media': ['social', 'instagram', 'youtube', 'discord', 'telegram', 'creator', 'reels', 'tiktok'],
+      'communication': ['communication', 'team', 'chat', 'support', 'client', 'outreach'],
+      'selling': ['sell', 'selling', 'reselling', 'commerce', 'arbitrage', 'marketplace', 'deal'],
+      'teaching': ['teach', 'teaching', 'guide', 'tutorial', 'mentor', 'instruction']
+    };
+
+    for (const skill of userSkills) {
+      if (skill === 'beginner' || skill === 'no-specific-skill') continue;
+      const keywords = skillKeywordMap[skill] || [skill];
+      const matched = keywords.some(k => oppSkills.includes(k) || oppTitle.includes(k) || oppDesc.includes(k) || oppCategorySlug.includes(k));
+      if (matched) {
+        score += 25;
+        const skillName = skill.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        matchReasons.push(`Requires skills you selected: ${skillName}`);
+        skillMatched = true;
+        break;
+      }
+    }
+
+    if (!skillMatched && opp.skillLevel === 'BEGINNER') {
+      score += 15;
+      matchReasons.push('Accessible prerequisite requirements');
+    }
+  }
+
+  // 3. Starting Cost / Budget Match
+  const userBudget = answers.budget;
+  if (userBudget) {
+    if (userBudget === '0' || userBudget === 'zero') {
+      if (isFree) {
+        score += 30;
+        matchReasons.push(`Requires ₹0 listed starting cost (${opp.startingCost || 'Free entry'})`);
+      } else {
+        score -= 20; // Budget mismatch for zero budget
+      }
+    } else if (userBudget === 'under-500') {
+      if (isFree || oppCost.includes('500') || !oppCost.includes('2,000')) {
+        score += 25;
+        matchReasons.push(`Fits within your budget (${opp.startingCost || 'Free / Low cost'})`);
+      }
+    } else if (userBudget === '500-2000' || userBudget === '2000-plus') {
+      score += 20;
+      matchReasons.push(`Within your starting budget range (${opp.startingCost || 'Listed'})`);
+    }
+  }
+
+  // 4. Category / Type Interest Match
+  const userCategories = Array.isArray(answers.categoryInterests) 
+    ? answers.categoryInterests.map(c => String(c).toLowerCase().trim()) 
+    : (answers.categoryInterests ? [String(answers.categoryInterests).toLowerCase().trim()] : []);
+
+  if (userCategories.length > 0) {
+    for (const cat of userCategories) {
+      if (cat === 'all' || oppCategorySlug === cat || 
+         (cat === 'rewards' && (oppCategorySlug === 'quick-gigs' || oppEarningModel.includes('task') || oppCategorySlug === 'gaming')) ||
+         (cat === 'creator' && (oppCategorySlug === 'creator' || oppCategorySlug === 'creator-programs')) ||
+         (cat === 'creator-programs' && oppCategorySlug === 'creator') ||
+         (cat === 'digital-products' && (oppCategorySlug === 'freelancing' || oppCategorySlug === 'creator' || oppCategorySlug === 'reselling')) ||
+         (cat === 'finance' && (oppCategorySlug === 'finance' || oppCategorySlug === 'investing')) ||
+         (cat === 'finance / investing' && oppCategorySlug === 'finance')) {
+        score += 35;
+        matchReasons.push(`Matches your selected interest in ${opp.category?.name || 'this category'}`);
+        break;
+      }
+    }
+  }
+
+  // 5. Priorities Match
+  const priority = answers.primaryPriority;
+  if (priority) {
+    if ((priority === 'low-cost' || priority === 'low-starting-cost') && isFree) {
+      score += 20;
+      matchReasons.push('Requires zero listed capital, matching your low-cost preference');
+    } else if ((priority === 'flexible-timing' || priority === 'flexible') && (oppTime.includes('flexible') || oppTime.includes('task') || oppTime.includes('anytime'))) {
+      score += 20;
+      matchReasons.push('Offers flexible timing suited to your schedule');
+    } else if ((priority === 'remote-work' || priority === 'remote') && (oppLocation.includes('online') || oppLocation.includes('remote') || oppLocation.includes('global'))) {
+      score += 20;
+      matchReasons.push('100% online & remote opportunity');
+    } else if (priority === 'skill-development' && (opp.steps?.length >= 3 || opp.skillLevel !== 'BEGINNER')) {
+      score += 20;
+      matchReasons.push('Structured multi-step workflow helps develop practical skills');
+    } else if (priority === 'quick-participation' && (opp.skillLevel === 'BEGINNER' || isFree || oppCategorySlug === 'quick-gigs')) {
+      score += 20;
+      matchReasons.push('Straightforward onboarding for quick participation');
+    } else if (priority === 'long-term' && (oppCategorySlug === 'freelancing' || oppCategorySlug === 'creator' || oppCategorySlug === 'reselling')) {
+      score += 20;
+      matchReasons.push('Established repeatable method suitable for long-term consistency');
+    }
+  }
+
+  // Deduplicate match reasons and limit to top 4
+  const uniqueReasons = [...new Set(matchReasons)].slice(0, 4);
+
+  return {
+    score,
+    matchReasons: uniqueReasons,
+    isCompatible: score >= 25 && (userBudget !== '0' && userBudget !== 'zero' ? true : isFree)
+  };
+}
+
+/**
+ * Find My Opportunity — Interactive Questionnaire Matching Endpoint
+ */
+router.post('/match', async (req, res) => {
+  try {
+    const {
+      dailyTime,
+      skills = [],
+      budget,
+      categoryInterests = [],
+      primaryPriority,
+      // Optional post-matching filter overrides
+      filterCategory,
+      filterRisk,
+      filterSkill,
+      filterCost
+    } = req.body || {};
+
+    const answers = {
+      dailyTime: dailyTime ? String(dailyTime).trim() : null,
+      skills: Array.isArray(skills) ? skills : (skills ? [skills] : []),
+      budget: budget ? String(budget).trim() : null,
+      categoryInterests: Array.isArray(categoryInterests) ? categoryInterests : (categoryInterests ? [categoryInterests] : []),
+      primaryPriority: primaryPriority ? String(primaryPriority).trim() : null
+    };
+
+    // Fetch all active verified opportunities
+    const opportunities = await prisma.opportunity.findMany({
+      where: {
+        status: 'VERIFIED',
+        healthStatus: { not: 'SUSPENDED' }
+      },
+      include: {
+        category: true,
+        steps: { orderBy: { stepNumber: 'asc' } },
+        evidence: { select: { id: true, type: true, verifiedStatus: true } },
+        _count: { select: { memberships: true, comments: true, experiences: true } }
+      }
+    });
+
+    let scoredOpps = opportunities.map(opp => {
+      const matchResult = calculateOpportunityMatch(opp, answers);
+      return {
+        id: opp.id,
+        title: opp.title,
+        slug: opp.slug,
+        category: opp.category.name,
+        categorySlug: opp.category.slug,
+        categoryIcon: opp.category.icon,
+        description: opp.description,
+        skillsRequired: opp.skillsRequired,
+        timeRequired: opp.timeRequired,
+        startingCost: opp.startingCost,
+        potentialEarning: opp.potentialEarning,
+        earningModel: opp.earningModel,
+        location: opp.location,
+        riskLevel: opp.riskLevel,
+        skillLevel: opp.skillLevel,
+        healthStatus: opp.healthStatus,
+        status: opp.status,
+        officialSource: opp.officialSource,
+        platformWebsite: opp.platformWebsite,
+        joinsCount: opp.joinsCount,
+        stepsCount: opp.steps.length,
+        evidenceCount: opp.evidence.length,
+        experiencesCount: opp._count.experiences,
+        matchReasons: matchResult.matchReasons,
+        relevanceScore: matchResult.score,
+        isCompatible: matchResult.isCompatible
+      };
+    });
+
+    // Filter out completely incompatible opportunities (if any) and sort by relevance score
+    scoredOpps = scoredOpps
+      .filter(opp => opp.relevanceScore > 0)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+    // Apply optional post-result filters
+    if (filterCategory && filterCategory !== 'all') {
+      scoredOpps = scoredOpps.filter(opp => opp.categorySlug === String(filterCategory).toLowerCase());
+    }
+    if (filterRisk && filterRisk !== 'all') {
+      scoredOpps = scoredOpps.filter(opp => opp.riskLevel === String(filterRisk).toUpperCase());
+    }
+    if (filterSkill && filterSkill !== 'all') {
+      scoredOpps = scoredOpps.filter(opp => opp.skillLevel === String(filterSkill).toUpperCase());
+    }
+    if (filterCost && filterCost !== 'all') {
+      if (filterCost === 'free') {
+        scoredOpps = scoredOpps.filter(opp => {
+          const c = (opp.startingCost || '').toLowerCase();
+          return c.includes('₹0') || c.includes('$0') || c.includes('free') || c.includes('0');
+        });
+      }
+    }
+
+    return res.json({
+      success: true,
+      totalMatched: scoredOpps.length,
+      userAnswers: answers,
+      opportunities: scoredOpps
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * Compare multiple opportunities side-by-side
  */
 router.get('/compare', async (req, res) => {

@@ -71,6 +71,7 @@ export async function initNavbar(activePath = '') {
   let navLinksHtml = `
     <a class="${currentPath === '/' || currentPath === '/index.html' ? 'active' : ''}" href="/">Discover</a>
     <a class="${currentPath.startsWith('/opportunities') ? 'active' : ''}" href="/opportunities">Opportunities</a>
+    <a class="${currentPath.startsWith('/find') ? 'active' : ''}" href="/find-my-opportunity">🎯 Find Match</a>
   `;
 
   if (currentUser) {

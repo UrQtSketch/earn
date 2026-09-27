@@ -1,384 +1,344 @@
-/**
- * EarnRadar Unified API Client
- */
+function getAuthHeaders(extra = {}) {
+  const headers = { ...extra };
+  const token = localStorage.getItem('earnradar_token');
+  if (token && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+async function request(url, options = {}) {
+  const opts = { ...options };
+  opts.credentials = 'include';
+  opts.headers = getAuthHeaders(opts.headers || {});
+  
+  const res = await fetch(url, opts);
+  return res.json();
+}
 
 export const API = {
   // Authentication & Session
   async getSession() {
-    const res = await fetch('/api/auth/me');
-    return res.json();
+    return request('/api/auth/me');
   },
 
   async requestOTP(email, purpose = 'SIGNUP') {
-    const res = await fetch('/api/auth/request-otp', {
+    return request('/api/auth/request-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, purpose })
     });
-    return res.json();
   },
 
   async register(data) {
-    const res = await fetch('/api/auth/register', {
+    const res = await request('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
+    if (res.success && res.token) {
+      localStorage.setItem('earnradar_token', res.token);
+    }
+    return res;
   },
 
   async login(email, password) {
-    const res = await fetch('/api/auth/login', {
+    const res = await request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    return res.json();
+    if (res.success && res.token) {
+      localStorage.setItem('earnradar_token', res.token);
+    }
+    return res;
   },
 
   async resetPassword(email, otp, newPassword) {
-    const res = await fetch('/api/auth/reset-password', {
+    return request('/api/auth/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, otp, newPassword })
     });
-    return res.json();
   },
 
   async logout() {
-    const res = await fetch('/api/auth/logout', { method: 'POST' });
-    return res.json();
+    localStorage.removeItem('earnradar_token');
+    return request('/api/auth/logout', { method: 'POST' });
   },
 
   // User Profiles & Activity
   async getProfile() {
-    const res = await fetch('/api/users/profile');
-    return res.json();
+    return request('/api/users/profile');
   },
 
   async updateProfile(data) {
-    const res = await fetch('/api/users/profile', {
+    return request('/api/users/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async completeOnboarding(data) {
-    const res = await fetch('/api/users/onboarding', {
+    return request('/api/users/onboarding', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async getPublicProfile(username) {
-    const res = await fetch(`/api/users/${username}`);
-    return res.json();
+    return request(`/api/users/${username}`);
   },
 
   // Opportunities & Categories
   async getCategories() {
-    const res = await fetch('/api/opportunities/categories');
-    return res.json();
+    return request('/api/opportunities/categories');
   },
 
   async getOpportunities(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/opportunities?${query}`);
-    return res.json();
+    return request(`/api/opportunities?${query}`);
   },
 
   async getOpportunity(idOrSlug) {
-    const res = await fetch(`/api/opportunities/${idOrSlug}`);
-    return res.json();
+    return request(`/api/opportunities/${idOrSlug}`);
   },
 
   async joinOpportunity(id) {
-    const res = await fetch(`/api/opportunities/${id}/join`, { method: 'POST' });
-    return res.json();
+    return request(`/api/opportunities/${id}/join`, { method: 'POST' });
   },
 
   async leaveOpportunity(id) {
-    const res = await fetch(`/api/opportunities/${id}/leave`, { method: 'POST' });
-    return res.json();
+    return request(`/api/opportunities/${id}/leave`, { method: 'POST' });
   },
 
   async saveOpportunity(id) {
-    const res = await fetch(`/api/opportunities/${id}/save`, { method: 'POST' });
-    return res.json();
+    return request(`/api/opportunities/${id}/save`, { method: 'POST' });
   },
 
   async compareOpportunities(ids) {
     const idList = Array.isArray(ids) ? ids.join(',') : ids;
-    const res = await fetch(`/api/opportunities/compare?ids=${encodeURIComponent(idList)}`);
-    return res.json();
+    return request(`/api/opportunities/compare?ids=${encodeURIComponent(idList)}`);
   },
 
   async submitExperience(opportunityId, data) {
-    const res = await fetch(`/api/opportunities/${opportunityId}/experience`, {
+    return request(`/api/opportunities/${opportunityId}/experience`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async postComment(opportunityId, content, parentId = null) {
-    const res = await fetch(`/api/discussions/opportunity/${opportunityId}`, {
+    return request(`/api/discussions/opportunity/${opportunityId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content, parentId })
     });
-    return res.json();
+  },
+
+  async deleteComment(commentId) {
+    return request(`/api/discussions/${commentId}`, { method: 'DELETE' });
   },
 
   async matchOpportunities(answers) {
-    const res = await fetch('/api/opportunities/match', {
+    return request('/api/opportunities/match', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(answers)
     });
-    return res.json();
   },
 
   // 9-Step Submissions
   async getMySubmissions() {
-    const res = await fetch('/api/submissions/my');
-    return res.json();
+    return request('/api/submissions/my');
   },
 
   async getSubmission(id) {
-    const res = await fetch(`/api/submissions/${id}`);
-    return res.json();
+    return request(`/api/submissions/${id}`);
   },
 
   async submitMethod(formData, isDraft = false) {
-    const res = await fetch('/api/submissions', {
+    return request('/api/submissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ formData, isDraft })
     });
-    return res.json();
   },
 
   async updateSubmission(id, formData, isDraft = false) {
-    const res = await fetch(`/api/submissions/${id}`, {
+    return request(`/api/submissions/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ formData, isDraft })
     });
-    return res.json();
   },
 
   async uploadProofFiles(formData) {
-    const res = await fetch('/api/submissions/upload-proof', {
+    return request('/api/submissions/upload-proof', {
       method: 'POST',
       body: formData
     });
-    return res.json();
-  },
-
-  // Discussions & Comments
-  async postComment(opportunityId, content, parentId = null) {
-    const res = await fetch(`/api/discussions/opportunity/${opportunityId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, parentId })
-    });
-    return res.json();
-  },
-
-  async deleteComment(commentId) {
-    const res = await fetch(`/api/discussions/${commentId}`, { method: 'DELETE' });
-    return res.json();
   },
 
   // Collaborations & Messaging
   async getCollaborations() {
-    const res = await fetch('/api/collaborations');
-    return res.json();
+    return request('/api/collaborations');
   },
 
   async sendCollaborationRequest(receiverId, opportunityId, message) {
-    const res = await fetch('/api/collaborations/request', {
+    return request('/api/collaborations/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ receiverId, opportunityId, message })
     });
-    return res.json();
   },
 
   async respondCollaboration(requestId, action) {
-    const res = await fetch(`/api/collaborations/respond/${requestId}`, {
+    return request(`/api/collaborations/respond/${requestId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action })
     });
-    return res.json();
   },
 
   async getConversations() {
-    const res = await fetch('/api/messages/conversations');
-    return res.json();
+    return request('/api/messages/conversations');
   },
 
   async getMessages(conversationId) {
-    const res = await fetch(`/api/messages/conversations/${conversationId}`);
-    return res.json();
+    return request(`/api/messages/conversations/${conversationId}`);
   },
 
   async sendMessage(conversationId, recipientId, content) {
-    const res = await fetch('/api/messages/send', {
+    return request('/api/messages/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversationId, recipientId, content })
     });
-    return res.json();
   },
 
   // Notifications
   async getNotifications() {
-    const res = await fetch('/api/notifications');
-    return res.json();
+    return request('/api/notifications');
   },
 
   async markNotificationRead(id) {
-    const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
-    return res.json();
+    return request(`/api/notifications/${id}/read`, { method: 'PATCH' });
   },
 
   async markAllNotificationsRead() {
-    const res = await fetch('/api/notifications/read-all', { method: 'POST' });
-    return res.json();
+    return request('/api/notifications/read-all', { method: 'POST' });
   },
 
   async blockUser(targetUserId, action = 'BLOCK') {
-    const res = await fetch('/api/messages/block', {
+    return request('/api/messages/block', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUserId, action })
     });
-    return res.json();
   },
 
   // Reports
   async submitReport(targetType, targetId, reason, details, evidenceUrl = null) {
-    const res = await fetch('/api/reports', {
+    return request('/api/reports', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetType, targetId, reason, details, evidenceUrl })
     });
-    return res.json();
   },
 
   // Admin APIs
   async getAdminMetrics() {
-    const res = await fetch('/api/admin/metrics');
-    return res.json();
+    return request('/api/admin/metrics');
   },
 
   async getAdminUsers(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/admin/users?${query}`);
-    return res.json();
+    return request(`/api/admin/users?${query}`);
   },
 
   async updateAdminUserStatus(userId, data) {
-    const res = await fetch(`/api/admin/users/${userId}/status`, {
+    return request(`/api/admin/users/${userId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async getAdminSubmissions(status = '') {
-    const res = await fetch(`/api/admin/submissions?status=${status}`);
-    return res.json();
+    return request(`/api/admin/submissions?status=${status}`);
   },
 
   async reviewAdminSubmission(id, action, adminFeedback = '', categoryId = '') {
-    const res = await fetch(`/api/admin/submissions/${id}/review`, {
+    return request(`/api/admin/submissions/${id}/review`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, adminFeedback, categoryId })
     });
-    return res.json();
   },
 
   async getAdminClaims() {
-    const res = await fetch('/api/admin/claims');
-    return res.json();
+    return request('/api/admin/claims');
   },
 
   async updateAdminClaim(claimId, status, adminNote = '') {
-    const res = await fetch(`/api/admin/claims/${claimId}`, {
+    return request(`/api/admin/claims/${claimId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, adminNote })
     });
-    return res.json();
   },
 
   async getAdminReports(status = '') {
-    const res = await fetch(`/api/admin/reports?status=${status}`);
-    return res.json();
+    return request(`/api/admin/reports?status=${status}`);
   },
 
   async resolveAdminReport(reportId, status, resolution = '') {
-    const res = await fetch(`/api/admin/reports/${reportId}`, {
+    return request(`/api/admin/reports/${reportId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, resolution })
     });
-    return res.json();
   },
 
   async getAdminOpportunities(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/admin/opportunities?${query}`);
-    return res.json();
+    return request(`/api/admin/opportunities?${query}`);
   },
 
   async updateAdminOpportunityHealth(opportunityId, data) {
-    const res = await fetch(`/api/admin/opportunities/${opportunityId}/health`, {
+    return request(`/api/admin/opportunities/${opportunityId}/health`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async getAdminEvidence(params = {}) {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/admin/evidence?${query}`);
-    return res.json();
+    return request(`/api/admin/evidence?${query}`);
   },
 
   async updateAdminEvidence(evidenceId, data) {
-    const res = await fetch(`/api/admin/evidence/${evidenceId}`, {
+    return request(`/api/admin/evidence/${evidenceId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.json();
   },
 
   async getAdminAuditLogs() {
-    const res = await fetch('/api/admin/audit-logs');
-    return res.json();
+    return request('/api/admin/audit-logs');
   },
 
   async getAnalytics() {
-    const res = await fetch('/api/analytics/overview');
-    return res.json();
+    return request('/api/analytics/overview');
   },
 
   async getDevOutbox() {
-    const res = await fetch('/api/auth/dev-outbox');
-    return res.json();
+    return request('/api/auth/dev-outbox');
   }
 };

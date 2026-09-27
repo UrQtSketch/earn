@@ -88,13 +88,19 @@
 
     await initNavbar('/login');
 
+    const params = new URLSearchParams(window.location.search);
+    const prefillEmail = params.get('email');
+    if (prefillEmail) {
+      document.getElementById('email').value = prefillEmail;
+    }
+
     const form = document.getElementById('login-form');
     const submitBtn = document.getElementById('submit-btn');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
 
       submitBtn.disabled = true;
@@ -105,12 +111,15 @@
         if (res.success) {
           showToast(`Welcome back, ${res.user.profile?.fullName || 'User'}!`, 'success');
           setTimeout(() => {
-            if (res.user.role === 'ADMIN') {
+            const redirectParam = params.get('redirect');
+            if (redirectParam && redirectParam.startsWith('/')) {
+              window.location.href = redirectParam;
+            } else if (res.user.role === 'ADMIN') {
               window.location.href = '/admin';
             } else {
               window.location.href = '/dashboard';
             }
-          }, 600);
+          }, 500);
         } else {
           showToast(res.error || 'Invalid credentials.', 'error');
           submitBtn.disabled = false;

@@ -122,21 +122,42 @@
       });
     });
 
-    // Check dev outbox for quick auto-fill helper in development
+    // Helper to auto-fill OTP boxes
+    function fillOtp(otp) {
+      if (!otp) return;
+      const str = String(otp).trim();
+      str.split('').forEach((char, i) => {
+        if (otpBoxes[i]) otpBoxes[i].value = char;
+      });
+      if (otpBoxes[5]) otpBoxes[5].focus();
+    }
+
+    const devHelper = document.getElementById('dev-otp-helper');
+    const devOtpCode = document.getElementById('dev-otp-code');
+    const autoFillBtn = document.getElementById('auto-fill-btn');
+
+    // 1. Check if debugOtp is in pending signup
+    if (pendingSignup && pendingSignup.debugOtp) {
+      devHelper.style.display = 'block';
+      devOtpCode.textContent = pendingSignup.debugOtp;
+      fillOtp(pendingSignup.debugOtp);
+    }
+
+    autoFillBtn.addEventListener('click', () => {
+      fillOtp(devOtpCode.textContent);
+    });
+
+    // 2. Check dev outbox for quick auto-fill helper in development
     try {
       const outboxRes = await API.getDevOutbox();
       if (outboxRes.success && outboxRes.emails && outboxRes.emails.length > 0) {
         const latest = outboxRes.emails.find(m => m.to.toLowerCase() === email.toLowerCase());
         if (latest && latest.otp) {
-          const devHelper = document.getElementById('dev-otp-helper');
           devHelper.style.display = 'block';
-          document.getElementById('dev-otp-code').textContent = latest.otp;
-          document.getElementById('auto-fill-btn').addEventListener('click', () => {
-            latest.otp.split('').forEach((digit, i) => {
-              if (otpBoxes[i]) otpBoxes[i].value = digit;
-            });
-            otpBoxes[5].focus();
-          });
+          devOtpCode.textContent = latest.otp;
+          if (!otpBoxes[0].value) {
+            fillOtp(latest.otp);
+          }
         }
       }
     } catch (_) {}
@@ -163,6 +184,15 @@
         const res = await API.requestOTP(email, purpose);
         if (res.success) {
           showToast('New verification code sent!', 'success');
+          if (res.debugOtp) {
+            devHelper.style.display = 'block';
+            devOtpCode.textContent = res.debugOtp;
+            fillOtp(res.debugOtp);
+            if (pendingSignup) {
+              pendingSignup.debugOtp = res.debugOtp;
+              sessionStorage.setItem('earnradar_pending_signup', JSON.stringify(pendingSignup));
+            }
+          }
           cooldown = 60;
           resendBtn.innerHTML = `Resend in <span id="timer-sec">60</span>s`;
         } else {
@@ -195,7 +225,7 @@
         if (purpose === 'SIGNUP') {
           if (!pendingSignup) {
             showToast('Signup session expired. Please sign up again.', 'error');
-            setTimeout(() => window.location.href = '/signup', 1000);
+            setTimeout(() => window.location.href = `/signup${email ? `?email=${encodeURIComponent(email)}` : ''}`, 1000);
             return;
           }
 
@@ -209,7 +239,7 @@
             showToast('Account verified and created successfully!', 'success');
             setTimeout(() => {
               window.location.href = '/onboarding';
-            }, 800);
+            }, 600);
           } else {
             showToast(regRes.error || 'Verification failed.', 'error');
             verifyBtn.disabled = false;

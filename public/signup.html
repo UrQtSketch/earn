@@ -140,13 +140,14 @@
             fullName,
             email,
             password,
-            termsAccepted
+            termsAccepted,
+            debugOtp: otpRes.debugOtp || null
           }));
 
-          showToast('Verification code sent to your email!', 'success');
+          showToast(otpRes.debugOtp ? `Verification code generated: ${otpRes.debugOtp}` : 'Verification code sent to your email!', 'success');
           setTimeout(() => {
             window.location.href = `/verify-email?email=${encodeURIComponent(email)}&purpose=SIGNUP`;
-          }, 600);
+          }, 400);
         } else {
           showToast(otpRes.error || 'Failed to send OTP code.', 'error');
           submitBtn.disabled = false;

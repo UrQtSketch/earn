@@ -337,6 +337,21 @@ export const API = {
     return res.json();
   },
 
+  async getAdminOpportunities(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`/api/admin/opportunities?${query}`);
+    return res.json();
+  },
+
+  async updateAdminOpportunityHealth(opportunityId, data) {
+    const res = await fetch(`/api/admin/opportunities/${opportunityId}/health`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return res.json();
+  },
+
   async getAdminAuditLogs() {
     const res = await fetch('/api/admin/audit-logs');
     return res.json();

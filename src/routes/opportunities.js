@@ -595,6 +595,23 @@ router.get('/:idOrSlug', async (req, res) => {
       isSaved = Boolean(saved);
     }
 
+    // Calculate report statistics for transparent health status
+    const [openReportsCount, resolvedReportsCount] = await Promise.all([
+      prisma.report.count({
+        where: { targetType: 'OPPORTUNITY', targetId: opportunity.id, status: { in: ['OPEN', 'UNDER_REVIEW'] } }
+      }),
+      prisma.report.count({
+        where: { targetType: 'OPPORTUNITY', targetId: opportunity.id, status: { in: ['ACTION_TAKEN', 'DISMISSED'] } }
+      })
+    ]);
+
+    let communityReportSummary = 'No recent reports';
+    if (openReportsCount > 0) {
+      communityReportSummary = `${openReportsCount} report${openReportsCount > 1 ? 's' : ''} currently under review`;
+    } else if (resolvedReportsCount > 0) {
+      communityReportSummary = `${resolvedReportsCount} report${resolvedReportsCount > 1 ? 's' : ''} resolved`;
+    }
+
     // Parse safety checklist safely
     let parsedSafetyChecklist = [];
     try {
@@ -607,7 +624,11 @@ router.get('/:idOrSlug', async (req, res) => {
       success: true,
       opportunity: {
         ...opportunity,
+        sourceStatus: opportunity.sourceStatus || 'SOURCE_CHECKED',
         safetyChecklist: parsedSafetyChecklist,
+        openReportsCount,
+        resolvedReportsCount,
+        communityReportSummary,
         userMembership,
         isSaved
       }

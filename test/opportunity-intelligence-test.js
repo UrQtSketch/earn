@@ -55,9 +55,9 @@ async function runOpportunityIntelligenceTests() {
   assert.ok(htmlText.includes('Opportunity Intelligence'), 'HTML must contain Opportunity Intelligence title');
   assert.ok(htmlText.includes('What You Need to Start'), 'HTML must contain Prerequisites section');
   assert.ok(htmlText.includes('Money Details'), 'HTML must contain Financial Transparency section');
-  assert.ok(htmlText.includes('Honest Assessment &amp; Red Flags') || htmlText.includes('Honest Assessment'), 'HTML must contain Reality Check section');
+  assert.ok(htmlText.includes('Reality Check'), 'HTML must contain Reality Check section');
   assert.ok(htmlText.includes('How This Opportunity Works'), 'HTML must contain Step-by-Step section');
-  assert.ok(htmlText.includes('Source &amp; Verification Trail'), 'HTML must contain Source & Verification section');
+  assert.ok(htmlText.includes('Source &amp; Verification') || htmlText.includes('Source &amp; Verification History'), 'HTML must contain Source & Verification section');
   assert.ok(htmlText.includes('Stay Safe Checklist'), 'HTML must contain Stay Safe checklist');
   recordPass('Opportunity Intelligence page structure & sections confirmed');
 

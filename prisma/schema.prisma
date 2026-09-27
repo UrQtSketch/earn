@@ -110,6 +110,11 @@ model Opportunity {
   commonScams      String?
   safetyChecklist  String?                 // JSON stringified array
   videoUrl         String?
+  sourceStatus     String?                 @default("SOURCE_CHECKED") // SOURCE_CHECKED, SOURCE_NEEDS_REVIEW, SOURCE_UNAVAILABLE, NOT_CHECKED
+  reviewReason     String?
+  competition      String?                 // Low competition information available, Moderate competition reported, High competition reported, Competition varies, Not enough data
+  incomeConsistency String?                // Variable, Task-dependent, Performance-dependent, Demand-dependent, Platform-dependent, Not established, Not listed
+  platformDependence String?               // Third-party platform, Marketplace, Social network, Payment provider, Gaming platform, Direct clients, Multiple platforms, Not listed
   lastVerifiedDate DateTime?               @default(now())
   viewsCount       Int                     @default(0)
   joinsCount       Int                     @default(0)
@@ -349,14 +354,18 @@ model CommunityExperience {
 }
 
 model OpportunityVerificationLog {
-  id            String      @id @default(uuid())
-  opportunityId String
-  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  stage         String      // SUBMISSION, SOURCE_CHECKED, EVIDENCE_REVIEWED, ADMIN_AUDIT, HEALTH_CHECK
-  status        String      // VERIFIED, NEEDS_REVIEW, SUSPENDED, PENDING
-  note          String?
-  checkedBy     String?     // e.g. "EarnRadar Moderation Team"
-  createdAt     DateTime    @default(now())
+  id                 String      @id @default(uuid())
+  opportunityId      String
+  opportunity        Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  stage              String?     // SUBMISSION, SOURCE_CHECKED, EVIDENCE_REVIEWED, ADMIN_AUDIT, HEALTH_CHECK
+  status             String      // VERIFIED, NEEDS_REVIEW, SUSPENDED, PENDING
+  note               String?
+  notes              String?
+  verificationMethod String?
+  checkedBy          String?     // e.g. "EarnRadar Moderation Team"
+  verifiedBy         String?
+  verifiedAt         DateTime?   @default(now())
+  createdAt          DateTime    @default(now())
 
   @@index([opportunityId, createdAt])
 }

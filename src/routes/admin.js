@@ -567,4 +567,132 @@ router.get('/audit-logs', async (req, res) => {
   }
 });
 
+/**
+ * List Opportunities for Admin Moderation
+ */
+router.get('/opportunities', async (req, res) => {
+  try {
+    const { healthStatus, status, search } = req.query;
+    const where = {};
+    if (healthStatus) where.healthStatus = healthStatus;
+    if (status) where.status = status;
+    if (search && String(search).trim()) {
+      where.OR = [
+        { title: { contains: String(search).trim() } },
+        { slug: { contains: String(search).trim() } }
+      ];
+    }
+
+    const opportunities = await prisma.opportunity.findMany({
+      where,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        category: true,
+        author: {
+          select: { profile: { select: { fullName: true, username: true } } }
+        },
+        _count: {
+          select: { memberships: true, comments: true, experiences: true }
+        }
+      }
+    });
+
+    return res.json({ success: true, opportunities });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * Update Opportunity Health & Verification Status
+ */
+router.patch('/opportunities/:id/health', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      healthStatus,
+      status,
+      sourceStatus,
+      reviewReason,
+      verificationMethod = 'Staff Health Audit',
+      notes
+    } = req.body;
+
+    const allowedHealth = ['ACTIVE', 'NEEDS_REVIEW', 'SUSPENDED', 'ARCHIVED'];
+    const allowedStatus = ['VERIFIED', 'UNDER_REVIEW', 'COMMUNITY_REPORTED', 'NEEDS_REVIEW', 'REJECTED', 'SUSPENDED'];
+    const allowedSource = ['SOURCE_CHECKED', 'SOURCE_NEEDS_REVIEW', 'SOURCE_UNAVAILABLE', 'NOT_CHECKED'];
+
+    if (healthStatus && !allowedHealth.includes(healthStatus)) {
+      return res.status(400).json({ success: false, error: `Invalid health status. Must be one of: ${allowedHealth.join(', ')}` });
+    }
+    if (status && !allowedStatus.includes(status)) {
+      return res.status(400).json({ success: false, error: `Invalid status. Must be one of: ${allowedStatus.join(', ')}` });
+    }
+    if (sourceStatus && !allowedSource.includes(sourceStatus)) {
+      return res.status(400).json({ success: false, error: `Invalid source status. Must be one of: ${allowedSource.join(', ')}` });
+    }
+
+    const currentOpp = await prisma.opportunity.findUnique({ where: { id } });
+    if (!currentOpp) {
+      return res.status(404).json({ success: false, error: 'Opportunity not found.' });
+    }
+
+    const updateData = {
+      lastVerifiedDate: new Date()
+    };
+    if (healthStatus) updateData.healthStatus = healthStatus;
+    if (status) updateData.status = status;
+    if (sourceStatus) updateData.sourceStatus = sourceStatus;
+    if (reviewReason !== undefined) updateData.reviewReason = reviewReason ? String(reviewReason).trim() : null;
+
+    const updatedOpp = await prisma.opportunity.update({
+      where: { id },
+      data: updateData
+    });
+
+    // Create verification history log entry
+    const logNote = notes || reviewReason || `Health status updated to ${healthStatus || currentOpp.healthStatus} (${sourceStatus || currentOpp.sourceStatus || 'SOURCE_CHECKED'})`;
+    await prisma.opportunityVerificationLog.create({
+      data: {
+        opportunityId: id,
+        stage: 'HEALTH_CHECK',
+        status: status || currentOpp.status,
+        note: logNote,
+        notes: logNote,
+        verificationMethod,
+        checkedBy: req.user.profile?.fullName || 'EarnRadar Moderation Team',
+        verifiedBy: req.user.id,
+        verifiedAt: new Date()
+      }
+    });
+
+    // Create immutable admin audit log
+    await createAuditLog({
+      adminId: req.user.id,
+      action: `OPPORTUNITY_HEALTH_UPDATE`,
+      targetType: 'OPPORTUNITY',
+      targetId: id,
+      details: {
+        title: updatedOpp.title,
+        previousHealth: currentOpp.healthStatus,
+        newHealth: updatedOpp.healthStatus,
+        previousStatus: currentOpp.status,
+        newStatus: updatedOpp.status,
+        sourceStatus: updatedOpp.sourceStatus,
+        reviewReason: updatedOpp.reviewReason,
+        notes: logNote
+      },
+      req
+    });
+
+    return res.json({
+      success: true,
+      message: 'Opportunity health status and verification logs updated successfully.',
+      opportunity: updatedOpp
+    });
+  } catch (err) {
+    return res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 export default router;

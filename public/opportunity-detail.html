@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opportunity Intelligence — EarnRadar</title>
+  <title>Opportunity Intelligence &amp; Reality Check — EarnRadar</title>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/app.css">
 </head>
@@ -235,33 +235,68 @@
       const isJoined = Boolean(opp.userMembership);
       const isSaved = Boolean(opp.isSaved);
 
-      // Safe field values
+      // Part A: Reality Check Fields (Factual or "Not listed")
+      const costVal = opp.startingCost ? escapeHtml(opp.startingCost) : 'Not listed';
       const timeVal = opp.timeRequired ? escapeHtml(opp.timeRequired) : 'Not listed';
-      const costVal = opp.startingCost ? escapeHtml(opp.startingCost) : '₹0 / Not listed';
-      const skillVal = opp.skillLevel ? escapeHtml(opp.skillLevel) : 'Not specified by the source';
-      const riskVal = opp.riskLevel ? escapeHtml(opp.riskLevel) : 'Not listed';
-      const earningModelVal = opp.earningModel ? escapeHtml(opp.earningModel) : 'Variable / Task-based';
+      
+      // Learning Curve
+      let learningCurveVal = 'Not specified by the source';
+      if (opp.skillLevel) {
+        if (opp.skillLevel === 'BEGINNER') learningCurveVal = 'Beginner';
+        else if (opp.skillLevel === 'INTERMEDIATE') learningCurveVal = 'Intermediate';
+        else if (opp.skillLevel === 'ADVANCED') learningCurveVal = 'Advanced';
+        else learningCurveVal = escapeHtml(opp.skillLevel);
+      }
+
+      // Competition
+      const competitionVal = opp.competition ? escapeHtml(opp.competition) : 'Not enough data';
+      const isCommunityCompetition = competitionVal.toLowerCase().includes('reported') || competitionVal.toLowerCase().includes('community');
+
+      // Income Consistency
+      const incomeConsistencyVal = opp.incomeConsistency ? escapeHtml(opp.incomeConsistency) : 'Variable (Task & demand dependent)';
+
+      // Platform Dependence
+      const platformDependenceVal = opp.platformDependence || (opp.platformWebsite ? 'Third-party platform' : 'Not listed');
+
+      // Earning Model & Availability
+      const earningModelVal = opp.earningModel ? escapeHtml(opp.earningModel) : 'Not specified';
       const locationVal = opp.location ? escapeHtml(opp.location) : 'Online / Global';
-      const whoCanDoItVal = opp.whoCanDoIt ? escapeHtml(opp.whoCanDoIt) : 'Anyone meeting platform prerequisites';
+      const whoCanDoItVal = opp.whoCanDoIt ? escapeHtml(opp.whoCanDoIt) : 'Not specified by the source';
       const skillsRequiredVal = opp.skillsRequired ? escapeHtml(opp.skillsRequired) : 'Not specified by the source';
       const platformWebsiteVal = opp.platformWebsite || opp.officialSource;
 
-      // Status pill classes
-      const healthClass = (opp.healthStatus || 'ACTIVE').toLowerCase();
-      const riskClass = (opp.riskLevel || 'LOW').toLowerCase().replace(/\s+/g, '-');
+      // Part B: Health Status Data
+      const healthState = opp.healthStatus || 'ACTIVE';
+      const healthClass = healthState.toLowerCase().replace(/\s+/g, '_');
+      
+      let healthMeaning = 'Current information is available and the opportunity has not been flagged for suspension.';
+      if (healthState === 'NEEDS_REVIEW') {
+        healthMeaning = opp.reviewReason ? `Some information may require re-checking: ${escapeHtml(opp.reviewReason)}` : 'Some information may require re-checking.';
+      } else if (healthState === 'SUSPENDED') {
+        healthMeaning = opp.reviewReason ? `EarnRadar has temporarily restricted this opportunity while relevant concerns are reviewed: ${escapeHtml(opp.reviewReason)}` : 'EarnRadar has temporarily restricted this opportunity while relevant concerns are reviewed.';
+      } else if (healthState === 'ARCHIVED') {
+        healthMeaning = 'This opportunity is no longer being actively tracked.';
+      }
+
+      const sourceStatusState = opp.sourceStatus || 'SOURCE_CHECKED';
+      const lastCheckedStr = opp.lastVerifiedDate ? `${formatTimeAgo(opp.lastVerifiedDate)} (${new Date(opp.lastVerifiedDate).toLocaleDateString()})` : 'Not available';
+
+      // Category check for finance / investment risk disclosure
+      const categorySlug = (opp.category?.slug || '').toLowerCase();
+      const isFinance = categorySlug.includes('finance') || categorySlug.includes('invest') || categorySlug.includes('crypto') || categorySlug.includes('trading') || (opp.riskLevel === 'CAPITAL_AT_RISK');
 
       document.getElementById('dossier-root').innerHTML = `
         <!-- Top Breadcrumb & Actions Header -->
         <div class="dossier-header">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
             <div class="tags" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <span class="status-pill ${healthClass}">● ${escapeHtml(opp.healthStatus || 'ACTIVE')}</span>
-              <span class="status-pill active">🛡 ${escapeHtml(opp.status || 'VERIFIED')}</span>
+              <span class="status-pill ${healthClass}">● ${escapeHtml(healthState)}</span>
+              <span class="badge badge-cyan">Source: ${escapeHtml(sourceStatusState.replace(/_/g, ' '))}</span>
               <span class="badge badge-purple">${escapeHtml(opp.category?.name || 'General')}</span>
-              <span class="badge ${opp.riskLevel === 'LOW' ? 'badge-green' : opp.riskLevel === 'HIGH' ? 'badge-red' : 'badge-yellow'}">
+              <span class="badge ${opp.riskLevel === 'LOW' ? 'badge-green' : opp.riskLevel === 'HIGH' || opp.riskLevel === 'CAPITAL_AT_RISK' ? 'badge-red' : 'badge-yellow'}">
                 Risk: ${escapeHtml(opp.riskLevel || 'LOW')}
               </span>
-              <em style="font-size: 11px; color: var(--dim); margin-left: 4px;">Last checked: ${opp.lastVerifiedDate ? formatTimeAgo(opp.lastVerifiedDate) : 'Recently'}</em>
+              <em style="font-size: 11px; color: var(--dim); margin-left: 4px;">Last checked: ${lastCheckedStr}</em>
             </div>
 
             <div style="display: flex; gap: 10px;">
@@ -287,7 +322,7 @@
           <!-- 6-Card Quick Intelligence Matrix -->
           <div class="intel-matrix">
             <div class="intel-metric-card">
-              <span class="intel-label">⏱ Time Required</span>
+              <span class="intel-label">⏱ Time Commitment</span>
               <strong class="intel-val">${timeVal}</strong>
             </div>
 
@@ -297,13 +332,13 @@
             </div>
 
             <div class="intel-metric-card">
-              <span class="intel-label">🎯 Skill Level</span>
-              <strong class="intel-val">${skillVal}</strong>
+              <span class="intel-label">🎯 Learning Curve</span>
+              <strong class="intel-val">${learningCurveVal}</strong>
             </div>
 
             <div class="intel-metric-card">
               <span class="intel-label">⚠ Risk Profile</span>
-              <strong class="intel-val" style="color: ${opp.riskLevel === 'LOW' ? 'var(--green)' : opp.riskLevel === 'HIGH' ? 'var(--red)' : 'var(--yellow)'};">${riskVal}</strong>
+              <strong class="intel-val" style="color: ${opp.riskLevel === 'LOW' ? 'var(--green)' : opp.riskLevel === 'HIGH' || opp.riskLevel === 'CAPITAL_AT_RISK' ? 'var(--red)' : 'var(--yellow)'};">${escapeHtml(opp.riskLevel || 'Not listed')}</strong>
             </div>
 
             <div class="intel-metric-card">
@@ -318,11 +353,114 @@
           </div>
         </div>
 
+        <!-- Opportunity Health Overview Banner -->
+        <div class="health-overview-card ${healthClass}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="status-pill ${healthClass}" style="font-weight: 700; font-size: 11px;">● ${escapeHtml(healthState)}</span>
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">Opportunity Health Status</span>
+            </div>
+            <div style="font-size: 11px; color: var(--muted);">
+              Last Checked: <b style="color: var(--text-primary);">${lastCheckedStr}</b>
+            </div>
+          </div>
+
+          <p style="font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0 0 12px 0;">
+            ${healthMeaning}
+          </p>
+
+          <div style="display: flex; gap: 18px; font-size: 11px; color: var(--dim); flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 10px;">
+            <span>Source Status: <b style="color: var(--cyan);">${escapeHtml(sourceStatusState.replace(/_/g, ' '))}</b></span>
+            <span>Community Reports: <b style="color: ${opp.openReportsCount > 0 ? 'var(--yellow)' : 'var(--text-primary)'};">${escapeHtml(opp.communityReportSummary || 'No recent reports')}</b></span>
+            <span style="color: var(--dim); font-style: italic;">(Reports are audited by moderators before any official status change)</span>
+          </div>
+        </div>
+
         <!-- 2-Column Main Intelligence Layout -->
         <div class="dossier-grid">
           <!-- Main Left Column -->
           <div>
-            <!-- Section 1: What You Need (Prerequisites & Eligibility) -->
+            <!-- Section 1: Reality Check (Factual 8-Facet Intelligence) -->
+            <div class="intel-section caution">
+              <div class="eyebrow" style="color: var(--yellow);"><i></i> FACTUAL INTELLIGENCE</div>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px; color: var(--yellow);">Reality Check</h2>
+              
+              <div class="intel-field-grid" style="margin-bottom: 16px;">
+                <div class="intel-field-item">
+                  <span class="field-label">1. Starting Cost</span>
+                  <div class="field-value" style="color: var(--cyan);">${costVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">2. Time Commitment</span>
+                  <div class="field-value">${timeVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">3. Learning Curve</span>
+                  <div class="field-value">${learningCurveVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">4. Competition ${isCommunityCompetition ? '<span style="font-size: 9px; color: var(--yellow);">(Community-reported)</span>' : ''}</span>
+                  <div class="field-value">${competitionVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">5. Income Consistency</span>
+                  <div class="field-value">${incomeConsistencyVal}</div>
+                </div>
+
+                <div class="intel-field-item">
+                  <span class="field-label">6. Platform Dependence</span>
+                  <div class="field-value">${escapeHtml(platformDependenceVal)}</div>
+                </div>
+              </div>
+
+              <!-- 7. Main Risks -->
+              <div style="margin-top: 18px;">
+                <div class="reality-callout risk">
+                  <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+                    7. Main Risks &amp; Vulnerabilities
+                  </strong>
+                  <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
+                    ${escapeHtml(opp.risks || 'Market competition, task volume fluctuations, and platform policy revisions.')}
+                  </p>
+                </div>
+
+                <div class="reality-callout risk">
+                  <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
+                    Common Scams &amp; Fraud Warnings
+                  </strong>
+                  <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
+                    ${escapeHtml(opp.commonScams || 'Never pay advance registration, test fees, or security deposits to unknown intermediaries.')}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Finance / Investment Risk Box (Part G) -->
+              ${isFinance ? `
+                <div class="finance-risk-box">
+                  <div class="risk-icon">⚠</div>
+                  <div>
+                    <strong style="font-size: 12px; color: var(--red); display: block; margin-bottom: 2px;">Finance &amp; Capital Risk Warning</strong>
+                    <p style="font-size: 11px; color: #ffccd5; margin: 0; line-height: 1.4;">
+                      Capital is at risk. Returns are not guaranteed. EarnRadar does not provide financial or investment advice.
+                    </p>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- 8. "What this does not tell you" Transparency Box -->
+              <div class="transparency-box">
+                <strong>Important: What This Does Not Tell You</strong>
+                <p style="font-size: 11.5px; color: var(--muted); margin: 0; line-height: 1.5;">
+                  EarnRadar information does not guarantee income, acceptance, payment, or success. Actual results can depend on the platform, market conditions, user skill, available opportunities, competition, and other external factors.
+                </p>
+              </div>
+            </div>
+
+            <!-- Section 2: What You Need (Prerequisites & Eligibility) -->
             <div class="intel-section">
               <div class="eyebrow"><i></i> PREREQUISITES &amp; ELIGIBILITY</div>
               <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">What You Need to Start</h2>
@@ -339,8 +477,8 @@
                 </div>
 
                 <div class="intel-field-item">
-                  <span class="field-label">Experience Level</span>
-                  <div class="field-value">${skillVal}</div>
+                  <span class="field-label">Experience Tier</span>
+                  <div class="field-value">${learningCurveVal}</div>
                 </div>
 
                 <div class="intel-field-item">
@@ -350,10 +488,10 @@
               </div>
             </div>
 
-            <!-- Section 2: Money Details (Costs, Fees & Payout Rails) -->
+            <!-- Section 3: Money Details (Costs, Fees & Payout Rails) -->
             <div class="intel-section highlight">
               <div class="eyebrow" style="color: var(--cyan);"><i></i> FINANCIAL TRANSPARENCY</div>
-              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Money Details &amp; Earning Architecture</h2>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Money Details &amp; Payout Rails</h2>
 
               <div class="intel-field-grid">
                 <div class="intel-field-item">
@@ -388,39 +526,6 @@
               </div>
             </div>
 
-            <!-- Section 3: Reality Check (Honest Practical Assessment) -->
-            <div class="intel-section caution">
-              <div class="eyebrow" style="color: var(--yellow);"><i></i> REALITY CHECK</div>
-              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px; color: var(--yellow);">Honest Assessment &amp; Red Flags</h2>
-
-              <div class="reality-callout">
-                <strong style="font-size: 12px; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
-                  Income Consistency &amp; Platform Dependence
-                </strong>
-                <p style="font-size: 12px; color: #f0e6d2; margin: 0; line-height: 1.5;">
-                  Income is variable and project-based. Earnings depend on task availability and platform approval. It should not be treated as fixed guaranteed employment.
-                </p>
-              </div>
-
-              <div class="reality-callout risk">
-                <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
-                  Known Practical Risks
-                </strong>
-                <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
-                  ${escapeHtml(opp.risks || 'Market competition, task volume fluctuations, and platform policy revisions.')}
-                </p>
-              </div>
-
-              <div class="reality-callout risk">
-                <strong style="font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
-                  Common Scams &amp; Fraud Warnings
-                </strong>
-                <p style="font-size: 12px; color: #ffccd5; margin: 0; line-height: 1.5;">
-                  ${escapeHtml(opp.commonScams || 'Never pay advance registration or security deposits to unknown Telegram/WhatsApp handlers claiming to provide guaranteed tasks.')}
-                </p>
-              </div>
-            </div>
-
             <!-- Section 4: How It Works (Step-by-Step Breakdown) -->
             <div class="intel-section">
               <div class="eyebrow"><i></i> STEP-BY-STEP REPRODUCTION</div>
@@ -446,10 +551,10 @@
               </div>
             </div>
 
-            <!-- Section 5: Source & Verification Logs -->
+            <!-- Section 5: Source & Verification Timeline (Part C) -->
             <div class="intel-section">
               <div class="eyebrow" style="color: var(--cyan);"><i></i> AUDIT &amp; SOURCE PROVENANCE</div>
-              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Source &amp; Verification Trail</h2>
+              <h2 style="font: 700 20px var(--font-heading); margin: 6px 0 16px;">Source &amp; Verification History</h2>
 
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
                 <div class="intel-field-item">
@@ -471,7 +576,7 @@
                 </div>
               </div>
 
-              <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px;">Verification Audit Timeline</div>
+              <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px;">Verification History Timeline</div>
               ${(opp.verificationLogs && opp.verificationLogs.length > 0) ? `
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                   ${opp.verificationLogs.map(log => `
@@ -480,14 +585,14 @@
                         <span class="badge ${log.status === 'VERIFIED' ? 'badge-green' : log.status === 'FLAGGED' ? 'badge-red' : 'badge-yellow'}">${escapeHtml(log.status)}</span>
                         <span style="font-size: 11px; color: var(--muted);">${new Date(log.verifiedAt || log.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <p style="font-size: 12px; color: var(--text-primary); margin: 4px 0 2px;"><b>${escapeHtml(log.verificationMethod || 'Staff Audit')}</b>: ${escapeHtml(log.notes)}</p>
-                      <span style="font-size: 10px; color: var(--dim);">Verified by Moderator ID #${escapeHtml(String(log.verifiedBy || 'Staff').slice(0, 8))}</span>
+                      <p style="font-size: 12px; color: var(--text-primary); margin: 4px 0 2px;"><b>${escapeHtml(log.verificationMethod || log.stage || 'Staff Audit')}</b>: ${escapeHtml(log.notes || log.note || 'Audit verified')}</p>
+                      <span style="font-size: 10px; color: var(--dim);">Audited by: ${escapeHtml(String(log.checkedBy || log.verifiedBy || 'EarnRadar Moderation Team'))}</span>
                     </div>
                   `).join('')}
                 </div>
               ` : `
                 <div style="padding: 14px 16px; background: var(--panel2); border-radius: 12px; font-size: 12px; color: var(--muted);">
-                  Verified by EarnRadar moderation team on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Payout rails, terms, and reproduction workflow inspected.
+                  No verification history available.
                 </div>
               `}
             </div>
@@ -673,18 +778,6 @@
                   </a>
                 </div>
               ` : ''}
-            </div>
-
-            <!-- Operational Health Card -->
-            <div class="card" style="padding: 18px; margin-top: 18px;">
-              <small class="eyebrow" style="color: var(--cyan);">DOSSIER HEALTH STATUS</small>
-              <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-                <span class="status-pill ${healthClass}">● ${escapeHtml(opp.healthStatus || 'ACTIVE')}</span>
-                <span style="font-size: 11px; color: var(--muted);">Operational</span>
-              </div>
-              <p style="font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0;">
-                Platform status verified on ${new Date(opp.lastVerifiedDate || opp.createdAt).toLocaleDateString()}. Community flagged reports: <b>0 open</b>.
-              </p>
             </div>
 
             <!-- Author Card -->

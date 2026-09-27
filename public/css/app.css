@@ -355,6 +355,80 @@
   background: rgba(125, 255, 178, 0.06);
 }
 
+.reality-callout.info {
+  border-left-color: var(--cyan);
+  background: rgba(103, 232, 255, 0.06);
+}
+
+/* Health Banner & Cards */
+.health-overview-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(16, 23, 34, 0.85);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.health-overview-card.active {
+  border-color: rgba(125, 255, 178, 0.3);
+}
+
+.health-overview-card.needs_review {
+  border-color: rgba(255, 216, 107, 0.35);
+  background: linear-gradient(180deg, rgba(35, 28, 14, 0.5) 0%, rgba(16, 23, 34, 0.9) 100%);
+}
+
+.health-overview-card.suspended {
+  border-color: rgba(255, 113, 139, 0.4);
+  background: linear-gradient(180deg, rgba(40, 16, 22, 0.6) 0%, rgba(16, 23, 34, 0.9) 100%);
+}
+
+.health-overview-card.archived {
+  border-color: rgba(150, 160, 175, 0.3);
+  background: linear-gradient(180deg, rgba(25, 30, 40, 0.6) 0%, rgba(16, 23, 34, 0.9) 100%);
+}
+
+.status-pill.archived {
+  color: var(--muted);
+  background: rgba(150, 160, 175, 0.1);
+  border: 1px solid rgba(150, 160, 175, 0.3);
+}
+
+/* Finance / Investment Capital Risk Box */
+.finance-risk-box {
+  border: 1px solid rgba(255, 113, 139, 0.35);
+  background: rgba(255, 113, 139, 0.08);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.finance-risk-box .risk-icon {
+  font-size: 20px;
+  color: var(--red);
+  line-height: 1;
+}
+
+.transparency-box {
+  border: 1px solid rgba(103, 232, 255, 0.25);
+  background: rgba(103, 232, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 16px;
+}
+
+.transparency-box strong {
+  color: var(--cyan);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: block;
+  margin-bottom: 4px;
+}
+
 .proof-card {
   border: 1px solid var(--line);
   border-radius: 12px;
